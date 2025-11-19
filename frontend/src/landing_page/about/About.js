@@ -1,7 +1,15 @@
 import React from 'react'
+import Hero from  './Hero'
+import Team from './Team'
+
  function About() {
   return (
-    <div><h1>About</h1></div>
+    
+    <div className='p-2'>
+     
+      <Hero />
+      <Team />  
+      </div>
   )
 }
 export default About;
