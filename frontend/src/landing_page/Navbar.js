@@ -1,11 +1,11 @@
 import React from "react";
-
+import {Link} from "react-router-dom";
 function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
       <div className="container py-2">
         {/* Brand Logo */}
-        <a className="navbar-brand d-flex align-items-center" href="#">
+        <a className="navbar-brand d-flex align-items-center" href="/">
           <img
             src="media/images/logo.svg"
             alt="Zerodha Logo"
@@ -31,29 +31,29 @@ function Navbar() {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav gap-3">
             <li className="nav-item">
-              <a className="nav-link fw-medium" href="#">
+              <Link className="nav-link fw-medium" to="/signup">
                 Sign Up
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link fw-medium" href="#">
+              <Link className="nav-link fw-medium" to="/about">
                 About
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link fw-medium" href="#">
+              <Link  className="nav-link fw-medium" to="/product">
                 Products
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link fw-medium" href="#">
+              <Link className="nav-link fw-medium" to="/pricing">
                 Pricing
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link fw-medium" href="#">
+              <Link className="nav-link fw-medium" to="/support">
                 Support
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

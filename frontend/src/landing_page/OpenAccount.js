@@ -3,14 +3,7 @@ import React from "react";
 function OpenAccount() {
   return (
     <div className="container text-center py-5 my-5">
-      {/* Image Section */}
-      <img
-        src="media/images/homeHero.png"
-        alt="Zerodha Account Illustration"
-        className="img-fluid rounded mb-4"
-        style={{ maxWidth: "900px", height: "auto" }}
-      />
-
+  
       {/* Text Section */}
       <h1 className="fw-semibold mt-4">Open a Zerodha Account</h1>
       <p className="text-muted mb-4 fs-5">
