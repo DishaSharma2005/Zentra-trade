@@ -1,5 +1,7 @@
 import React from "react";
 import {Link} from "react-router-dom";
+//import Signup from "../auth/signup";
+
 function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">

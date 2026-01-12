@@ -1,5 +1,5 @@
 import React from "react";
-
+import {Link, link} from "react-router-dom";
 function Universe() {
   const logoBoxStyle = {
     height: "80px",
@@ -116,7 +116,9 @@ function Universe() {
       {/* CTA BUTTON */}
       <div className="mt-5">
         <button className="btn btn-primary px-4 py-2">
+          <Link to="/signup" style={{color: 'white', textDecoration: 'none'}}>  
           Sign up for free
+          </Link>
         </button>
       </div>
 

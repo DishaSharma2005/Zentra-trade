@@ -1,0 +1,86 @@
+.support-hero {
+  padding: 40px 80px;
+  background: #f9fafb;
+}
+
+.hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.my-ticket-btn {
+  background: #387ed1;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.support-search {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.support-container {
+  display: flex;
+  gap: 30px;
+  padding: 40px 80px;
+}
+
+.support-left {
+  flex: 2;
+}
+
+.support-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px;
+  border: 1px solid #eee;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.arrow {
+  font-size: 18px;
+}
+
+.support-right {
+  flex: 1;
+}
+
+.notice-box {
+  background: #fff3e0;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.quick-links {
+  background: #f9fafb;
+  padding: 15px;
+}
+.support-card-wrapper {
+  margin-bottom: 12px;
+}
+
+.support-content {
+  padding: 10px 20px;
+  border: 1px solid #eee;
+  border-top: none;
+  background: #fff;
+}
+
+.support-link {
+  padding: 8px 0;
+  color: #387ed1;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.support-link:hover {
+  text-decoration: underline;
+}

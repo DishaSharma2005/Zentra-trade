@@ -1,9 +1,15 @@
-import react from "react";
-function Support(){
-    return(
-        <div>
-            <h1>Support Page</h1>
-        </div>
-    )
-}   
-export default Support;
+import React from "react";
+import Hero from "./Hero";
+import CreateTicket from "./CreateTicket";
+import "./support.css";
+
+function SupportPage() {
+  return (
+    <>
+      <Hero />
+      <CreateTicket />
+    </>
+  );
+}
+
+export default SupportPage;
