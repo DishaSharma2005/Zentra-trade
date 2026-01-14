@@ -1,8 +1,18 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link,useNavigate} from "react-router-dom";
 //import Signup from "../auth/signup";
+import { useAuth } from "../context/AuthContext";
+import { supabase } from "../supabaseClient";
 
 function Navbar() {
+
+   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
       <div className="container py-2">
@@ -56,7 +66,36 @@ function Navbar() {
               <Link className="nav-link fw-medium" to="/support">
                 Support
               </Link>
-            </li>
+            </li>{/* AUTH BASED LINKS */}
+            {!user ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link fw-medium" to="/login">
+                    Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="btn btn-primary px-3" to="/signup">
+                    Sign Up
+                  </Link>
+                </li>
+              </>
+            ) : (<>
+                <li className="nav-item">
+                  <Link className="nav-link fw-medium" to="/dashboard">
+                    Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-outline-danger px-3"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

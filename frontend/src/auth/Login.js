@@ -1,9 +1,11 @@
 // landing_page/auth/Login.js
 import React from "react";
 import { supabase } from "../supabaseClient";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
 
@@ -15,11 +17,12 @@ function Login() {
       password,
     });
 
-    if (error) {
+   if (error) {
       alert(error.message);
+    } else {
+      navigate("/dashboard");
     }
   };
-
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",

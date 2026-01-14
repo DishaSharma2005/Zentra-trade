@@ -18,12 +18,23 @@ const Menu = () => {
 
   return (
     <div className="menu-container">
+
       <img src="logo.png" style={{ width: "50px" }} alt="logo" />
 
       <div className="menus">
         <ul>
           <li>
             <Link to="/" style={{ textDecoration: "none" }}>
+              <p
+                className={selectedMenu === -1 ? activeMenuClass : menuClass}
+                onClick={() => handleMenuClick(-1)}
+              >
+                Home
+              </p>
+            </Link>
+          </li>
+          <li>
+            <Link to="/dashboard" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 0 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(0)}
@@ -34,7 +45,7 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/orders" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/orders" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 1 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(1)}
@@ -45,7 +56,7 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/holdings" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/holdings" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 2 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(2)}
@@ -56,7 +67,7 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/positions" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/positions" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 3 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(3)}
@@ -67,7 +78,7 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/funds" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/funds" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 4 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(4)}
@@ -78,7 +89,7 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/apps" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/apps" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 5 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(5)}

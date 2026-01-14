@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <>
       <TopBar />
-      <Dashboard />
+       <Dashboard /> 
     </>
   );
 };
