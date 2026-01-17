@@ -1,6 +1,37 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 
 const Summary = () => {
+  const { user, loading } = useAuth();
+  const [balance, setBalance] = useState(null);
+
+  useEffect(() => {
+    if (!loading && user) {
+      fetchSummary();
+    }
+  }, [loading, user]);
+
+  const fetchSummary = async () => {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/user/summary/${user.id}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch summary");
+    }
+
+    const data = await res.json();
+    setBalance(data.balance);
+  } catch (err) {
+    console.error("Summary fetch failed:", err.message);
+  }
+};
+
+
+  if (loading) return <p>Loading...</p>;
+  if (balance === null) return <p>Loading wallet...</p>;
+
   return (
     <>
       <div className="username">
@@ -9,52 +40,26 @@ const Summary = () => {
       </div>
 
       <div className="section">
-        <span>
-          <p>Equity</p>
-        </span>
+        <p>Equity</p>
 
         <div className="data">
           <div className="first">
-            <h3>3.74k</h3>
+            <h3>₹{balance}</h3>
             <p>Margin available</p>
           </div>
+
           <hr />
 
           <div className="second">
             <p>
-              Margins used <span>0</span>{" "}
+              Margins used <span>0</span>
             </p>
             <p>
-              Opening balance <span>3.74k</span>{" "}
+              Opening balance <span>₹{balance}</span>
             </p>
           </div>
         </div>
-        <hr className="divider" />
-      </div>
 
-      <div className="section">
-        <span>
-          <p>Holdings (13)</p>
-        </span>
-
-        <div className="data">
-          <div className="first">
-            <h3 className="profit">
-              1.55k <small>+5.20%</small>{" "}
-            </h3>
-            <p>P&L</p>
-          </div>
-          <hr />
-
-          <div className="second">
-            <p>
-              Current Value <span>31.43k</span>{" "}
-            </p>
-            <p>
-              Investment <span>29.88k</span>{" "}
-            </p>
-          </div>
-        </div>
         <hr className="divider" />
       </div>
     </>
