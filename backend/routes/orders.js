@@ -5,9 +5,7 @@ import  supabase from "../supabaseAdmin.js";
 
 const router = express.Router();
 
-/**
- * PLACE ORDER
- */
+// PLACE ORDER
 router.post("/", async (req, res) => {
   try {
     const { userId, symbol, qty, price, type } = req.body;
@@ -18,32 +16,77 @@ router.post("/", async (req, res) => {
 
     const orderValue = qty * price;
 
-    // 1️⃣ Get wallet
-    const { data: wallet, error: walletError } = await supabase
+    // 1️⃣ Fetch wallet
+    const { data: wallet } = await supabase
       .from("wallets")
       .select("*")
       .eq("user_id", userId)
       .single();
 
-    if (walletError || !wallet) {
+    if (!wallet) {
       return res.status(404).json({ error: "Wallet not found" });
     }
 
-    // 2️⃣ Balance check
-    if (wallet.balance < orderValue) {
-      return res.status(400).json({ error: "Insufficient balance" });
+    // 2️⃣ Fetch holding
+    const { data: holding } = await supabase
+      .from("holdings")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("symbol", symbol)
+      .single();
+
+    // 🟢 BUY LOGIC
+    if (type === "BUY") {
+      if (wallet.balance < orderValue) {
+        return res.status(400).json({ error: "Insufficient balance" });
+      }
+
+      await supabase
+        .from("wallets")
+        .update({ balance: wallet.balance - orderValue })
+        .eq("user_id", userId);
+
+      if (holding) {
+        await supabase
+          .from("holdings")
+          .update({ quantity: holding.quantity + qty })
+          .eq("id", holding.id);
+      } else {
+        await supabase.from("holdings").insert([
+          {
+            user_id: userId,
+            symbol,
+            quantity: qty,
+          },
+        ]);
+      }
     }
 
-    // 3️⃣ Deduct balance
-    const { error: updateError } = await supabase
-      .from("wallets")
-      .update({ balance: wallet.balance - orderValue })
-      .eq("user_id", userId);
+    // 🔴 SELL LOGIC
+    if (type === "SELL") {
+      if (!holding || holding.quantity < qty) {
+        return res.status(400).json({ error: "Not enough holdings to sell" });
+      }
 
-    if (updateError) throw updateError;
+      const newQty = holding.quantity - qty;
 
-    // 4️⃣ Insert order
-    const { data: order, error: orderError } = await supabase
+      if (newQty === 0) {
+        await supabase.from("holdings").delete().eq("id", holding.id);
+      } else {
+        await supabase
+          .from("holdings")
+          .update({ quantity: newQty })
+          .eq("id", holding.id);
+      }
+
+      await supabase
+        .from("wallets")
+        .update({ balance: wallet.balance + orderValue })
+        .eq("user_id", userId);
+    }
+
+    // 3️⃣ Insert order
+    const { data: order } = await supabase
       .from("orders")
       .insert([
         {
@@ -57,8 +100,6 @@ router.post("/", async (req, res) => {
       ])
       .select()
       .single();
-
-    if (orderError) throw orderError;
 
     res.json({ success: true, order });
   } catch (err) {
