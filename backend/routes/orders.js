@@ -37,52 +37,111 @@ router.post("/", async (req, res) => {
 
     // 🟢 BUY LOGIC
     if (type === "BUY") {
-      if (wallet.balance < orderValue) {
-        return res.status(400).json({ error: "Insufficient balance" });
-      }
+  const buyQty = Number(qty);
+  const buyPrice = Number(price);
+  const orderValue = buyQty * buyPrice;
 
-      await supabase
-        .from("wallets")
-        .update({ balance: wallet.balance - orderValue })
-        .eq("user_id", userId);
+  if (wallet.balance < orderValue) {
+    return res.status(400).json({ error: "Insufficient balance" });
+  }
 
-      if (holding) {
-        await supabase
-          .from("holdings")
-          .update({ quantity: holding.quantity + qty })
-          .eq("id", holding.id);
-      } else {
-        await supabase.from("holdings").insert([
-          {
-            user_id: userId,
-            symbol,
-            quantity: qty,
-          },
-        ]);
-      }
+  // wallet update
+  await supabase
+    .from("wallets")
+    .update({ balance: wallet.balance - orderValue })
+    .eq("user_id", userId);
+
+  // transaction insert
+  await supabase.from("transactions").insert([
+    {
+      user_id: userId,
+      symbol,
+      type: "BUY",
+      quantity: buyQty,
+      price: buyPrice,
+      total_value: orderValue,
+      realized_pnl: null,
+    },
+  ]);
+
+  if (holding) {
+    const oldQty = Number(holding.quantity);
+    const oldAvg = Number(holding.avg_price);
+
+    const newQty = oldQty + buyQty;
+    const newAvg =
+      (oldQty * oldAvg + buyQty * buyPrice) / newQty;
+
+    await supabase
+      .from("holdings")
+      .update({
+        quantity: newQty,
+        avg_price: newAvg,
+      })
+      .eq("id", holding.id);
+  } else {
+    await supabase.from("holdings").insert([
+      {
+        user_id: userId,
+        symbol,
+        quantity: buyQty,
+        avg_price: buyPrice,
+      },
+    ]);
+  }
     }
 
     // 🔴 SELL LOGIC
     if (type === "SELL") {
-      if (!holding || holding.quantity < qty) {
+      // coerce numeric values
+      const sellQty = Number(qty);
+      const sellPrice = Number(price);
+      const holdingQty = Number(holding?.quantity || 0);
+      const holdingAvg = Number(holding?.avg_price || 0);
+
+      if (!holding || holdingQty < sellQty) {
         return res.status(400).json({ error: "Not enough holdings to sell" });
       }
 
-      const newQty = holding.quantity - qty;
+      const newQty = holdingQty - sellQty;
+      const realizedPnL = (sellPrice - holdingAvg) * sellQty;
+      const newWalletBalance = Number(wallet.balance) + sellQty * sellPrice;
 
+      // update or delete holding
       if (newQty === 0) {
-        await supabase.from("holdings").delete().eq("id", holding.id);
+        const { error: delErr } = await supabase
+          .from("holdings")
+          .delete()
+          .eq("id", holding.id);
+        if (delErr) throw delErr;
       } else {
-        await supabase
+        const { error: holdErr } = await supabase
           .from("holdings")
           .update({ quantity: newQty })
           .eq("id", holding.id);
+        if (holdErr) throw holdErr;
       }
 
-      await supabase
+      // update wallet balance
+      const { error: walletErr } = await supabase
         .from("wallets")
-        .update({ balance: wallet.balance + orderValue })
+        .update({ balance: newWalletBalance })
         .eq("user_id", userId);
+      if (walletErr) throw walletErr;
+
+      // insert transaction with realized PnL
+      const { error: txErr } = await supabase.from("transactions").insert([
+        {
+          user_id: userId,
+          symbol,
+          type: "SELL",
+          quantity: sellQty,
+          price: sellPrice,
+          total_value: sellQty * sellPrice,
+          realized_pnl: realizedPnL,
+        },
+      ]);
+      if (txErr) throw txErr;
     }
 
     // 3️⃣ Insert order

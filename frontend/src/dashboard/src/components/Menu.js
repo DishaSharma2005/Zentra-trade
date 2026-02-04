@@ -67,37 +67,16 @@ const Menu = () => {
           </li>
 
           <li>
-            <Link to="/dashboard/positions" style={{ textDecoration: "none" }}>
+            <Link to="/dashboard/transactions" style={{ textDecoration: "none" }}>
               <p
                 className={selectedMenu === 3 ? activeMenuClass : menuClass}
                 onClick={() => handleMenuClick(3)}
               >
-                Positions
+                Transactions
               </p>
             </Link>
           </li>
-
-          <li>
-            <Link to="/dashboard/funds" style={{ textDecoration: "none" }}>
-              <p
-                className={selectedMenu === 4 ? activeMenuClass : menuClass}
-                onClick={() => handleMenuClick(4)}
-              >
-                Funds
-              </p>
-            </Link>
-          </li>
-
-          <li>
-            <Link to="/dashboard/apps" style={{ textDecoration: "none" }}>
-              <p
-                className={selectedMenu === 5 ? activeMenuClass : menuClass}
-                onClick={() => handleMenuClick(5)}
-              >
-                Apps
-              </p>
-            </Link>
-          </li>
+          
         </ul>
 
         <hr />

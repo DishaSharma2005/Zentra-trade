@@ -29,6 +29,11 @@ const Holdings = () => {
             <tr>
               <th>Instrument</th>
               <th>Qty.</th>
+               <th>Avg</th>
+                <th>LTP</th>
+                <th>Invested</th>
+                <th>Current</th>
+                <th>P&L</th>
             </tr>
           </thead>
 
@@ -37,9 +42,23 @@ const Holdings = () => {
               <tr key={h.id}>
                 <td>{h.symbol}</td>
                 <td>{h.quantity}</td>
+                <td>₹{Number(h.avg_price).toFixed(2)}</td>
+
+                <td>₹{h.current_price}</td>
+                <td>₹{h.invested.toFixed(2)}</td>
+                <td>₹{h.current.toFixed(2)}</td>
+                <td
+                  style={{
+                    color: h.pnl >= 0 ? "green" : "red",
+                    fontWeight: 600,
+                  }}
+                >
+                  ₹{h.pnl.toFixed(2)} ({h.pnlPercent}%)
+                </td>
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </>

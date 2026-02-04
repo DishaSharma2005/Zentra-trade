@@ -14,7 +14,7 @@ const Summary = () => {
   const fetchSummary = async () => {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/user/summary/${user.id}`
+      `http://localhost:5000/api/portfolio/summary/${user.id}`
     );
 
     if (!res.ok) {
@@ -22,7 +22,7 @@ const Summary = () => {
     }
 
     const data = await res.json();
-    setBalance(data.balance);
+    setBalance(data.currentValue);
   } catch (err) {
     console.error("Summary fetch failed:", err.message);
   }
