@@ -6,7 +6,7 @@ import holdingRoutes from "./routes/holding.js";
 import userRoutes from "./routes/user.js";
 import portfolioRoutes from "./routes/portfolio.js";
 import transactionsRoutes from "./routes/transactions.js";
-//import priceRoutes from "./routes/prices.js";
+import watchlistRoutes from "./routes/watchlist.js";
 
 
 dotenv.config();
@@ -21,7 +21,8 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/holdings", holdingRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/transactions", transactionsRoutes);
-//app.use("/api/prices", priceRoutes);
+app.use("/api/watchlist", watchlistRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;
