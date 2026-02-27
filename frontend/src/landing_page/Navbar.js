@@ -43,9 +43,6 @@ function Navbar({ onAddFunds }) {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav gap-3">
             <li className="nav-item">
-              <Link className="nav-link fw-medium" to="/signup">
-                Sign Up
-              </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link fw-medium" to="/about">
@@ -75,9 +72,9 @@ function Navbar({ onAddFunds }) {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="btn btn-primary px-3" to="/signup">
-                    Sign Up
-                  </Link>
+                <Link className="nav-link fw-medium" to="/signup">
+                Sign Up
+              </Link>
                 </li>
               </>
             ) : (<>
