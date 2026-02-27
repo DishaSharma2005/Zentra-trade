@@ -34,9 +34,7 @@ router.post("/create-checkout-session", async (req, res) => {
   }
 });
 router.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
+  "/webhook", async (req, res) => {
     const sig = req.headers["stripe-signature"];
     let event;
 
@@ -55,33 +53,42 @@ router.post(
       const userId = session.metadata.userId;
       const amount = session.amount_total / 100;
 
-      // Update wallet
-      const { data: wallet } = await supabase
-        .from("wallets")
-        .select("balance")
-        .eq("user_id", userId)
+       //Existing payment check to prevent duplicates (e.g. if webhook is retried)
+        const { data: existingPayment } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("stripe_session_id", session.id)
         .single();
 
-      await supabase
-        .from("wallets")
-        .update({ balance: wallet.balance + amount })
-        .eq("user_id", userId);
+      if (existingPayment) {
+        return res.json({ received: true }); // already processed
+      }
 
-      // Save payment record
-      await supabase.from("payments").insert([
-        {
-          user_id: userId,
-          amount,
-          stripe_session_id: session.id,
-          status: "completed",
-        },
-      ]);
-    }
 
-    res.json({ received: true });
-  }
-);
+      // Get wallet
+  const { data: wallet } = await supabase
+    .from("wallets")
+    .select("balance")
+    .eq("user_id", userId)
+    .single();
 
+  // Update wallet
+  await supabase
+    .from("wallets")
+    .update({ balance: wallet.balance + amount })
+    .eq("user_id", userId);
+
+  // Insert payment record
+  await supabase.from("payments").insert([
+    {
+      user_id: userId,
+      amount,
+      stripe_session_id: session.id,
+      status: "completed",
+    },
+  ]);
+}
+  });
 // optional endpoint used by payment-success page to double-check status
 router.post("/verify-session", async (req, res) => {
   const { sessionId } = req.body;
@@ -89,28 +96,11 @@ router.post("/verify-session", async (req, res) => {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    // if paid, return success
-    if (session.payment_status === "paid") {
-      // update wallet if not already done by webhook
-      const userId = session.metadata.userId;
-      const amount = session.amount_total / 100;
 
-      const { data: wallet } = await supabase
-        .from("wallets")
-        .select("balance")
-        .eq("user_id", userId)
-        .single();
+    return res.json({
+      success: session.payment_status === "paid",
+    });
 
-      if (wallet) {
-        await supabase
-          .from("wallets")
-          .update({ balance: wallet.balance + amount })
-          .eq("user_id", userId);
-      }
-
-      return res.json({ success: true });
-    }
-    res.json({ success: false });
   } catch (err) {
     console.error("verify-session error", err.message);
     res.status(500).json({ error: err.message });
