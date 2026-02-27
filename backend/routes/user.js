@@ -34,7 +34,7 @@ router.post("/init", async (req, res) => {
       const { error: insertError } = await supabase.from("wallets").insert([
         {
           user_id,
-          balance: 100000, // ₹1L demo balance
+          balance: 0,
         },
       ]);
 
@@ -110,28 +110,44 @@ router.get("/summary/:userId", async (req, res) => {
     if (holdingsError) throw holdingsError;
 
     let totalInvestment = 0;
-    let currentValue = 0;
-    let todayPnL = 0;
+let currentValue = 0;
+let todayPnL = 0;
 
-    for (const stock of holdings) {
-      try {
-        const qty = Number(stock.quantity);
-        const avg = Number(stock.avg_price);
+if (holdings.length > 0) {
 
-        const quote = await yahooFinance.quote(`${stock.symbol}.NS`);
+  // 1️ Create all quote promises
+  const quotePromises = holdings.map(stock =>
+    yahooFinance.quote(`${stock.symbol}.NS`)
+  );
 
-        const currentPrice = Number(quote.regularMarketPrice || 0);
-        const previousClose = Number(quote.regularMarketPreviousClose || 0);
+  // 2️ Run all in parallel
+  const quotes = await Promise.allSettled(quotePromises);
 
-        totalInvestment += qty * avg;
-        currentValue += qty * currentPrice;
-        todayPnL += qty * (currentPrice - previousClose);
+  // 3️ Loop safely
+  holdings.forEach((stock, index) => {
+    const result = quotes[index];
 
-      } catch (err) {
-        console.log("Failed symbol:", stock.symbol);
-        continue;
-      }
+    if (result.status !== "fulfilled") {
+      console.log("Failed symbol:", stock.symbol);
+      return;
     }
+
+    const quote = result.value;
+
+    const qty = Number(stock.quantity) || 0;
+    const avg = Number(stock.avg_price) || 0;
+
+    const currentPrice = Number(quote.regularMarketPrice) || 0;
+    const previousClose = Number(quote.regularMarketPreviousClose) || 0;
+
+    totalInvestment += qty * avg;
+    currentValue += qty * currentPrice;
+
+    if (previousClose) {
+      todayPnL += qty * (currentPrice - previousClose);
+    }
+  });
+}
 
     totalInvestment = Number(totalInvestment) || 0;
     currentValue = Number(currentValue) || 0;
