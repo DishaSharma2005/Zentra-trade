@@ -31,6 +31,7 @@ const Summary = () => {
   if (!summary) return <p className="loading">Loading portfolio...</p>;
 
   const {
+    wallet,
     totalInvestment,
     currentValue,
     totalPnL,
@@ -46,6 +47,11 @@ const Summary = () => {
 
       <div className="greeting">
         <h4>Hi, {user?.email?.split("@")[0]} 👋</h4>
+        {wallet && (
+          <p className="wallet-balance">
+            Wallet: ₹ {wallet.balance?.toLocaleString()}
+          </p>
+        )}
       </div>
 
       <div className="card">

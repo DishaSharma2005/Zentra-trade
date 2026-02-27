@@ -13,7 +13,6 @@ const router = express.Router();
  * Body: { user_id }
  */
 router.post("/init", async (req, res) => {
-      console.log("🔥 /api/user/init hit", req.body);
   const { user_id } = req.body;
 
   if (!user_id) {
@@ -142,7 +141,9 @@ router.get("/summary/:userId", async (req, res) => {
     const totalPnLPercent =
       totalInvestment > 0 ? (totalPnL / totalInvestment) * 100 : 0;
 
+    // include wallet object so frontend can show current balance
     return res.json({
+      wallet,
       totalInvestment,
       currentValue,
       totalPnL,

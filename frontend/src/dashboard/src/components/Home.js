@@ -3,11 +3,11 @@ import React from "react";
 import Dashboard from "./Dashboard";
 import TopBar from "./TopBar";
 
-const Home = () => {
+const Home = ({ onAddFunds }) => {
   return (
     <>
-      <TopBar />
-       <Dashboard /> 
+      <TopBar onAddFunds={onAddFunds} />
+      <Dashboard onAddFunds={onAddFunds} />
     </>
   );
 };

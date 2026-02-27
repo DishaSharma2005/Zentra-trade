@@ -42,6 +42,21 @@ code {
   margin-right: 8px;
 }
 
+/* box around add funds button */
+.add-funds-box {
+  display: inline-block;
+  padding: 4px 6px;
+  border: 1px solid #388e3c; /* darker than the button for visibility */
+  border-radius: 4px;
+  margin-right: 8px;
+  background: #fff; /* contrast against green button */
+}
+.add-funds-box .btn-green {
+  background: #4caf50;
+}
+.add-funds-box:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
 .btn {
   text-decoration: none;
   padding: 10px 20px;
@@ -250,7 +265,7 @@ code {
 }
 
 .menu-container {
-  flex-basis: 68%;
+  flex: 1;
   height: 100%;
   padding: 10px 20px;
   box-sizing: border-box;
@@ -260,8 +275,9 @@ code {
 }
 
 .logo {
-  width: 30px;
-  height: 20px;
+  width: 60px;
+  height: auto;
+  display: block;
 }
 
 .menus {
@@ -290,6 +306,20 @@ code {
   color: rgb(245, 104, 52);
 }
 
+/* specific styling for Add Funds menu item */
+.add-funds-menu {
+  color: #4caf50;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border: 1px solid #388e3c;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+.add-funds-menu:hover {
+  color: #45a049;
+  background: rgba(76, 175, 80, 0.1);
+}
 hr {
   border-left: 0.8px solid rgb(243, 242, 242);
   height: 30px;
@@ -571,10 +601,13 @@ hr {
   height: 10vh;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   box-shadow: 0px 0px 4px 2px rgb(236, 235, 235);
   box-sizing: border-box;
   z-index: 9;
+  padding: 0 20px;
 }
+
 
 .indices-container {
   flex-basis: 32%;
@@ -1087,6 +1120,317 @@ hr {
   .pnl-section span {
     font-size: 0.7rem;
   }
+}
+
+/* Orders Component Styling */
+.order-buy {
+  color: rgb(72, 194, 55);
+  font-weight: 500;
+}
+
+.order-sell {
+  color: rgb(250, 118, 78);
+  font-weight: 500;
+}
+
+.order-completed {
+  color: rgb(72, 194, 55);
+  font-weight: 500;
+  background: rgb(240, 255, 240);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.order-pending {
+  color: rgb(255, 152, 0);
+  font-weight: 500;
+  background: rgb(255, 248, 240);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.order-cancelled {
+  color: rgb(244, 67, 54);
+  font-weight: 500;
+  background: rgb(255, 240, 240);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.order-timestamp {
+  font-size: 0.75rem;
+  color: rgb(153, 153, 153);
+}
+
+.orders {
+  width: 100%;
+}
+
+.loading-text,
+.error-text {
+  color: rgb(153, 153, 153);
+  font-size: 0.95rem;
+  font-weight: 300;
+  padding: 20px;
+}
+
+.error-text {
+  color: rgb(244, 67, 54);
+}
+
+/* Refresh Button & Orders Header */
+.orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2%;
+}
+
+.orders-header .btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-blue {
+  background: #4184f3;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.btn-blue:hover {
+  background: #2e5d8f;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(65, 132, 243, 0.3);
+}
+
+/* Enhanced Empty State */
+.no-orders-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.no-orders-subtext {
+  color: rgb(179, 179, 179);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Cancel Button Styles */
+.btn-cancel {
+  background: rgb(244, 67, 54);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background: rgb(229, 57, 53);
+  transform: scale(1.05);
+}
+
+.btn-cancel:disabled {
+  background: rgb(189, 189, 189);
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+.action-disabled {
+  color: rgb(189, 189, 189);
+  font-size: 0.85rem;
+}
+
+.order-action {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+/* Add Money Component Styling */
+.add-money-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4); /* translucent dark backdrop */
+  padding: 20px;
+}
+
+.add-money-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 450px;
+  width: 100%;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.add-money-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(71, 71, 71);
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgb(71, 71, 71);
+  margin-bottom: 10px;
+}
+
+.amount-input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 2px solid rgb(221, 221, 221);
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  color: rgb(73, 73, 73);
+}
+
+.amount-input:focus {
+  outline: none;
+  border-color: #4184f3;
+  box-shadow: 0 0 0 3px rgba(65, 132, 243, 0.1);
+}
+
+.amount-input:disabled {
+  background: rgb(245, 245, 245);
+  cursor: not-allowed;
+  color: rgb(153, 153, 153);
+}
+
+.amount-info {
+  font-size: 0.8rem;
+  color: rgb(153, 153, 153);
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.error-message {
+  background: rgb(255, 240, 240);
+  border-left: 4px solid rgb(244, 67, 54);
+  color: rgb(244, 67, 54);
+  padding: 12px 15px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.form-actions {
+  margin-bottom: 20px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4184f3 0%, #2e5d8f 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(65, 132, 243, 0.3);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(65, 132, 243, 0.4);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payment-info {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgb(153, 153, 153);
+  margin: 0;
+}
+
+.modal-close {
+  margin-top: 20px;
+  background: transparent;
+  border: 1px solid rgb(221, 221, 221);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: rgb(73, 73, 73);
+}
+.modal-close:hover {
+  background: rgb(245, 245, 245);
+}
+
+.payment-result-container {
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.payment-result-container h2 {
+  margin-bottom: 20px;
+  color: #313131;
+}
+.payment-result-container p {
+  margin: 8px 0;
+  color: #555;
 }
 
 

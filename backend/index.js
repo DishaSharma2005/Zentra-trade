@@ -7,6 +7,7 @@ import userRoutes from "./routes/user.js";
 import portfolioRoutes from "./routes/portfolio.js";
 import transactionsRoutes from "./routes/transactions.js";
 import watchlistRoutes from "./routes/watchlist.js";
+import paymentsRoutes from "./routes/payments.js";
 
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use("/api/holdings", holdingRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/transactions", transactionsRoutes);
 app.use("/api/watchlist", watchlistRoutes);
+app.use("/api/payments", paymentsRoutes);
 
 
 

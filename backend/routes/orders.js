@@ -189,4 +189,49 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+/**
+ * CANCEL ORDER
+ */
+router.delete("/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!orderId) {
+      return res.status(400).json({ error: "Order ID is required" });
+    }
+
+    // Fetch the order first
+    const { data: order, error: fetchErr } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .single();
+
+    if (fetchErr || !order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Only allow cancellation of PENDING orders
+    if (order.status !== "PENDING" && order.status !== "filled") {
+      return res.status(400).json({ 
+        error: `Cannot cancel ${order.status} order. Only PENDING orders can be cancelled.` 
+      });
+    }
+
+    // Update order status to CANCELLED
+    const { error: updateErr } = await supabase
+      .from("orders")
+      .update({ status: "CANCELLED" })
+      .eq("id", orderId);
+
+    if (updateErr) throw updateErr;
+
+    console.log(`✅ Order ${orderId} cancelled successfully`);
+    res.json({ success: true, message: "Order cancelled successfully" });
+  } catch (err) {
+    console.error("❌ Cancel order error:", err.message);
+    res.status(500).json({ error: "Failed to cancel order" });
+  }
+});
+
 export default router;

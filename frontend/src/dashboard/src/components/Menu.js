@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Menu = () => {
+const Menu = ({ onAddFunds }) => {
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
 
@@ -19,7 +19,7 @@ const Menu = () => {
   return (
     <div className="menu-container">
 
-      <img src="logo.png" style={{ width: "50px" }} alt="logo" />
+      <img src="/media/images/logo.svg" className="logo" alt="logo" />
 
       <div className="menus">
         <ul>
@@ -76,7 +76,18 @@ const Menu = () => {
               </p>
             </Link>
           </li>
-          
+          {onAddFunds && (
+            <li>
+              <p
+                className="menu add-funds-menu"
+                onClick={() => {
+                  onAddFunds();
+                }}
+              >
+                Add Funds
+              </p>
+            </li>
+          )}
         </ul>
 
         <hr />

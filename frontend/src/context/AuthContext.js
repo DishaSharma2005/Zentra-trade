@@ -7,11 +7,9 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 INIT USER IN BACKEND
+  // INIT USER IN BACKEND
   const initUserInBackend = async (user) => {
     try {
-      console.log("🔥 Initializing user in backend:", user.id);
-
       await fetch("http://localhost:5000/api/user/init", {
         method: "POST",
         headers: {

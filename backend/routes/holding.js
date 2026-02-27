@@ -29,7 +29,7 @@ router.get("/:userId", async (req, res) => {
         const avg = Number(h.avg_price);
         const qty = Number(h.quantity);
 
-        // 🔥 Add .NS for NSE stocks
+        //  Add .NS for NSE stocks
         const quote = await yahooFinance.quote(`${h.symbol}.NS`);
 
         const ltp = quote.regularMarketPrice || avg;

@@ -22,19 +22,27 @@ import NotFound from "./landing_page/NotFound";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 import DashboardHome from "./dashboard/src/components/Home";
+import PaymentSuccess from "./dashboard/src/components/payments/PaymentSuccess";
+import PaymentCancel from "./dashboard/src/components/payments/PaymentCancel";
 
 import { AuthProvider } from "./context/AuthContext";
 
-/* ✅ LAYOUT HANDLER */
+/*  LAYOUT HANDLER */
+import AddFundsModal from "./dashboard/src/components/AddFundsModal";
+
 function AppLayout() {
   const location = useLocation();
+  const [showAddFunds, setShowAddFunds] = React.useState(false);
 
-  // hide landing navbar/footer on dashboard
+  // hide landing navbar/footer on dashboard (modal will show only inside dashboard)
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
+
+  const openAddFunds = () => setShowAddFunds(true);
+  const closeAddFunds = () => setShowAddFunds(false);
 
   return (
     <>
-      {!isDashboardRoute && <Navbar />}
+      {!isDashboardRoute && <Navbar onAddFunds={openAddFunds} />}
 
       <Routes>
         {/* LANDING */}
@@ -45,13 +53,14 @@ function AppLayout() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/product" element={<Product />} />
         <Route path="/support" element={<Support />} />
+        {/* payment callbacks outside dashboard are no longer needed */}
 
         {/* DASHBOARD (PROTECTED) */}
         <Route
           path="/dashboard/*"
           element={
             <ProtectedRoute>
-              <DashboardHome />
+              <DashboardHome onAddFunds={openAddFunds} />
             </ProtectedRoute>
           }
         />
@@ -60,6 +69,11 @@ function AppLayout() {
       </Routes>
 
       {!isDashboardRoute && <Footer />}
+
+      {/* add funds modal rendered when requested */}
+      {showAddFunds && (
+        <AddFundsModal onClose={closeAddFunds} />
+      )}
     </>
   );
 }

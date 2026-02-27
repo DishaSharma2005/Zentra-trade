@@ -8,9 +8,17 @@ router.post("/prices", async (req, res) => {
     const { symbols } = req.body;
     const results = [];
 
+    // yahoo ticker mapping for symbols that differ from user-friendly names
+    const tickerMap = {
+      HUL: "HINDUNILVR",
+      // add other aliases here if needed
+    };
+
     for (let symbol of symbols) {
       try {
-        const quote = await yahooFinance.quote(`${symbol}.NS`);
+        // convert to actual ticker if mapped
+        const lookup = tickerMap[symbol] || symbol;
+        const quote = await yahooFinance.quote(`${lookup}.NS`);
 
         results.push({
           name: symbol,
@@ -21,6 +29,8 @@ router.post("/prices", async (req, res) => {
 
       } catch (err) {
         console.log("Failed symbol:", symbol);
+        // still push something so front-end doesn't hang, maybe nulls
+        results.push({ name: symbol, price: null, percent: "-", isDown: false });
       }
     }
 

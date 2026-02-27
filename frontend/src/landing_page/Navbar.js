@@ -4,7 +4,7 @@ import {Link,useNavigate} from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
 
-function Navbar() {
+function Navbar({ onAddFunds }) {
 
    const { user } = useAuth();
   const navigate = useNavigate();
