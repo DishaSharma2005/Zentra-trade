@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const WatchList = () => {
   const { user } = useAuth();
@@ -60,7 +61,7 @@ const WatchListItem = ({ stock }) => {
 
     const placeOrder = async (type) => {
       if (!user) {
-        alert("Please login");
+        toast.error("Please login");
         return;
       }
 
@@ -84,9 +85,10 @@ const WatchListItem = ({ stock }) => {
           return;
         }
 
-        alert(`${type} order placed successfully`);
+        toast.success(`${type} order placed successfully`);
       } catch (err) {
         console.error("Order failed", err);
+        toast.error("Failed to place order");
       }
     };
 

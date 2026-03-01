@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const Orders = () => {
   const { user } = useAuth();
@@ -53,10 +54,10 @@ const Orders = () => {
         }
 
         setOrders(orders.filter(o => o.id !== orderId));
-        alert("Order cancelled successfully");
+        toast.success("Order cancelled successfully");
       } catch (err) {
         console.error("Cancel order error:", err.message);
-        alert("Failed to cancel order: " + err.message);
+        toast.error("Failed to cancel order: " + err.message);
       } finally {
         setCancelling(null);
       }
