@@ -2,6 +2,7 @@
 import React from "react";
 import { supabase } from "../supabaseClient";
 import {Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Signup() {
   const handleEmailSignup = async (e) => {
@@ -16,9 +17,9 @@ function Signup() {
     });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
-      alert("Signup successful! You can login now.");
+      toast.info("Signup successful! You can login now.");
     }
   };
 

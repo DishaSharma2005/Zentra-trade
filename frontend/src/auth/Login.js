@@ -2,6 +2,7 @@
 import React from "react";
 import { supabase } from "../supabaseClient";
 import { Link , useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";  
 
 function Login() {
   const navigate = useNavigate();
@@ -18,8 +19,9 @@ function Login() {
     });
 
    if (error) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
+        toast.success("Login successful! Redirecting...");
       navigate("/dashboard");
     }
   };
