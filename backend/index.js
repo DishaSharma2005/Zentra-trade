@@ -8,7 +8,7 @@ import portfolioRoutes from "./routes/portfolio.js";
 import transactionsRoutes from "./routes/transactions.js";
 import watchlistRoutes from "./routes/watchlist.js";
 import paymentsRoutes from "./routes/payments.js";
-
+import chatRoutes from "./routes/chat.js";
 
 dotenv.config();
 
@@ -28,7 +28,7 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/transactions", transactionsRoutes);
 app.use("/api/watchlist", watchlistRoutes);
 app.use("/api/payments", paymentsRoutes);
-
+app.use("/api/chat", chatRoutes);
 
 
 const PORT = process.env.PORT || 5000;

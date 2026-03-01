@@ -22,8 +22,6 @@ import NotFound from "./landing_page/NotFound";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 import DashboardHome from "./dashboard/src/components/Home";
-import PaymentSuccess from "./dashboard/src/components/payments/PaymentSuccess";
-import PaymentCancel from "./dashboard/src/components/payments/PaymentCancel";
 
 import { AuthProvider } from "./context/AuthContext";
 
