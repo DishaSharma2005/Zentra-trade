@@ -46,7 +46,7 @@ export const calculatePortfolioSummary = async (userId) => {
 
   holdings.forEach((stock, index) => {
     const result = quotes[index];
-
+    
     if (result.status !== "fulfilled") {
       console.log("Failed symbol:", stock.symbol);
       return;
@@ -57,9 +57,10 @@ export const calculatePortfolioSummary = async (userId) => {
     const qty = Number(stock.quantity) || 0;
     const avg = Number(stock.avg_price) || 0;
 
-    const currentPrice = Number(quote.regularMarketPrice) || 0;
-    const previousClose =
-      Number(quote.regularMarketPreviousClose) || 0;
+  const currentPrice = quote?.regularMarketPrice;
+  const previousClose = quote?.regularMarketPreviousClose;
+  
+  if (currentPrice == null) return; 
 
     const investment = qty * avg;
     const current = qty * currentPrice;

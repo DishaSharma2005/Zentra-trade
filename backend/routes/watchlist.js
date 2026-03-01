@@ -1,7 +1,9 @@
 import express from "express";
 const router = express.Router();
 import YahooFinance from "yahoo-finance2";
-const yahooFinance = new YahooFinance();
+const yahooFinance = new YahooFinance({
+  suppressNotices: ["yahooSurvey"],
+});
 
 router.post("/prices", async (req, res) => {
   try {

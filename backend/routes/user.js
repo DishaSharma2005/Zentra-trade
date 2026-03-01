@@ -137,8 +137,13 @@ if (holdings.length > 0) {
     const qty = Number(stock.quantity) || 0;
     const avg = Number(stock.avg_price) || 0;
 
-    const currentPrice = Number(quote.regularMarketPrice) || 0;
-    const previousClose = Number(quote.regularMarketPreviousClose) || 0;
+   if (!quote || quote.regularMarketPrice == null) {
+  console.log("No price data for:", stock.symbol);
+  return;
+}
+
+const currentPrice = Number(quote.regularMarketPrice);
+const previousClose = Number(quote.regularMarketPreviousClose);
 
     totalInvestment += qty * avg;
     currentValue += qty * currentPrice;

@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import "../index.css";
 import TopBar from "./TopBar";
-import Apps from "./Apps";
+
 
 import Holdings from "./Holdings";
 import Orders from "./Orders";
@@ -27,8 +27,7 @@ const Dashboard = ({ onAddFunds }) => {
           <Route path="transactions" element={<Transactions />} />
           <Route path="wallet-success" element={<PaymentSuccess />} />
           <Route path="wallet-cancel" element={<PaymentCancel />} />
-          <Route path="apps" element={<Apps />} />
-
+         
         </Routes>
       </div>
     </div>
