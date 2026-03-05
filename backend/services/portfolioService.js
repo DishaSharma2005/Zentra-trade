@@ -6,19 +6,41 @@ const yahooFinance = new YahooFinance({
 });
 
 export const calculatePortfolioSummary = async (userId) => {
-  const { data: holdings, error } = await supabase
+  // ===============================
+  //  1. Fetch Holdings
+  // ===============================
+  const { data: holdings, error: holdingsError } = await supabase
     .from("holdings")
     .select("*")
     .eq("user_id", userId);
 
-  if (error) throw error;
+  if (holdingsError) throw holdingsError;
 
+  // ===============================
+  //  2. Fetch Total BUY Investment
+  // ===============================
+  const { data: buyOrders, error: orderError } = await supabase
+  .from("orders")
+  .select("qty, price")
+  .eq("user_id", userId)
+  .eq("type", "BUY")
+  .eq("status", "filled");
+
+  if (orderError) throw orderError;
+
+  let totalInvestment = 0;
+
+  buyOrders?.forEach((order) => {
+    totalInvestment += Number(order.qty) * Number(order.price);
+  });
+
+  // If no holdings, return clean summary
   if (!holdings || holdings.length === 0) {
     return {
-      totalInvestment: 0,
+      totalInvestment,
       currentValue: 0,
-      totalPnL: 0,
-      totalPnLPercent: 0,
+      totalPnL: -totalInvestment,
+      totalPnLPercent: totalInvestment > 0 ? -100 : 0,
       todayPnL: 0,
       bestStock: null,
       bestProfit: 0,
@@ -27,7 +49,6 @@ export const calculatePortfolioSummary = async (userId) => {
     };
   }
 
-  let totalInvestment = 0;
   let currentValue = 0;
   let todayPnL = 0;
 
@@ -37,18 +58,27 @@ export const calculatePortfolioSummary = async (userId) => {
   let worstStock = null;
   let worstLoss = Infinity;
 
-  // Fetch all quotes in parallel
+  // ===============================
+  //  3. Fetch Market Quotes
+  // ===============================
   const quotePromises = holdings.map((stock) =>
-    yahooFinance.quote(`${stock.symbol}.NS`)
+    yahooFinance.quote(`${stock.symbol}.NS`).catch((err) => {
+      // Catch silently or log softly to prevent Unhandled Promise Rejection
+      console.error(`Failed to fetch quote for ${stock.symbol}:`, err.message);
+      return null;
+    })
   );
 
   const quotes = await Promise.allSettled(quotePromises);
 
+  // ===============================
+  //  4. Calculate Current Values
+  // ===============================
   holdings.forEach((stock, index) => {
     const result = quotes[index];
-    
-    if (result.status !== "fulfilled") {
-      console.log("Failed symbol:", stock.symbol);
+
+    if (result.status !== "fulfilled" || !result.value) {
+      console.log("Skipping symbol due to fetch failure:", stock.symbol);
       return;
     }
 
@@ -57,36 +87,39 @@ export const calculatePortfolioSummary = async (userId) => {
     const qty = Number(stock.quantity) || 0;
     const avg = Number(stock.avg_price) || 0;
 
-  const currentPrice = quote?.regularMarketPrice;
-  const previousClose = quote?.regularMarketPreviousClose;
-  
-  if (currentPrice == null) return; 
+    const currentPrice = quote?.regularMarketPrice;
+    const previousClose = quote?.regularMarketPreviousClose;
 
-    const investment = qty * avg;
+    if (currentPrice == null) return;
+
     const current = qty * currentPrice;
-    const stockProfit = current - investment;
+    const investedInThisStock = qty * avg;
+    const stockProfit = current - investedInThisStock;
 
-    totalInvestment += investment;
     currentValue += current;
 
-    if (previousClose) {
+    if (previousClose != null) {
       todayPnL += qty * (currentPrice - previousClose);
     }
 
-    // Best stock logic
+    // Best performing stock
     if (stockProfit > bestProfit) {
       bestProfit = stockProfit;
       bestStock = stock.symbol;
     }
 
-    // Worst stock logic
+    // Worst performing stock
     if (stockProfit < worstLoss) {
       worstLoss = stockProfit;
       worstStock = stock.symbol;
     }
   });
 
+  // ===============================
+  //  5. Final Calculations
+  // ===============================
   const totalPnL = currentValue - totalInvestment;
+
   const totalPnLPercent =
     totalInvestment > 0
       ? (totalPnL / totalInvestment) * 100

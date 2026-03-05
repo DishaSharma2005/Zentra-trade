@@ -17,7 +17,6 @@ const WatchList = () => {
     "WIPRO",
     "RELIANCE",
     "HUL"
-    // removed M&M because & can break API
   ];
 
   useEffect(() => {
@@ -81,7 +80,7 @@ const WatchListItem = ({ stock }) => {
         const data = await res.json();
 
         if (!res.ok) {
-          alert(data.error);
+          toast.error(data.error);
           return;
         }
 

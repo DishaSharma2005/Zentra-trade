@@ -86,7 +86,7 @@ router.post("/", async (req, res) => {
     if (contains(["today"])) {
       const summary = await calculatePortfolioSummary(userId);
 
-      if (!summary || summary.totalInvestment === 0) {
+      if (!summary || summary.currentValue === 0) {
         return res.json({
           reply: "You don't have any holdings yet."
         });

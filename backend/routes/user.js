@@ -20,7 +20,7 @@ router.post("/init", async (req, res) => {
   }
 
   try {
-    // 1️⃣ Check wallet
+    // 1️ Check wallet
     const { data: wallet, error } = await supabase
       .from("wallets")
       .select("balance")
@@ -29,7 +29,7 @@ router.post("/init", async (req, res) => {
       .limit(1)
       .maybeSingle();
 
-    // 2️⃣ If wallet doesn't exist → create
+    // 2️ If wallet doesn't exist → create
     if (!wallet) {
       const { error: insertError } = await supabase.from("wallets").insert([
         {
@@ -64,7 +64,7 @@ router.get("/dashboard/:userId", async (req, res) => {
   }
 
   try {
-    // 1️⃣ Wallet
+    // 1️ Wallet
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("balance")
@@ -73,7 +73,7 @@ router.get("/dashboard/:userId", async (req, res) => {
 
     if (walletError) throw walletError;
 
-    // 2️⃣ Holdings
+    // 2️ Holdings
     const { data: holdings, error: holdingsError } = await supabase
       .from("holdings")
       .select("symbol, quantity")
@@ -94,6 +94,7 @@ router.get("/summary/:userId", async (req, res) => {
   const { userId } = req.params;
 
   try {
+    // 1️ Wallet
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("balance")
@@ -102,6 +103,7 @@ router.get("/summary/:userId", async (req, res) => {
 
     if (walletError) throw walletError;
 
+    // 2️ Fetch holdings to calculate Total Investment and Current Value
     const { data: holdings, error: holdingsError } = await supabase
       .from("holdings")
       .select("*")
@@ -110,59 +112,47 @@ router.get("/summary/:userId", async (req, res) => {
     if (holdingsError) throw holdingsError;
 
     let totalInvestment = 0;
-let currentValue = 0;
-let todayPnL = 0;
+    let currentValue = 0;
+    let todayPnL = 0;
 
-if (holdings.length > 0) {
+    if (holdings.length > 0) {
+      const quotePromises = holdings.map(stock =>
+        yahooFinance.quote(`${stock.symbol}.NS`).catch((err) => {
+          console.error(`Failed to fetch quote for ${stock.symbol}:`, err.message);
+          return null; // Return null to handle gracefully below
+        })
+      );
 
-  // 1️ Create all quote promises
-  const quotePromises = holdings.map(stock =>
-    yahooFinance.quote(`${stock.symbol}.NS`)
-  );
+      const quotes = await Promise.allSettled(quotePromises);
 
-  // 2️ Run all in parallel
-  const quotes = await Promise.allSettled(quotePromises);
+      holdings.forEach((stock, index) => {
+        const qty = Number(stock.quantity) || 0;
+        const avgPrice = Number(stock.avg_price) || 0;
+        
+        // Add to Total Investment based on current active holdings
+        totalInvestment += (qty * avgPrice);
 
-  // 3️ Loop safely
-  holdings.forEach((stock, index) => {
-    const result = quotes[index];
+        const result = quotes[index];
+        if (result.status !== "fulfilled") return;
 
-    if (result.status !== "fulfilled") {
-      console.log("Failed symbol:", stock.symbol);
-      return;
+        const quote = result.value;
+        if (!quote || quote.regularMarketPrice == null) return;
+
+        const currentPrice = Number(quote.regularMarketPrice);
+        const previousClose = Number(quote.regularMarketPreviousClose);
+
+        currentValue += qty * currentPrice;
+
+        if (previousClose) {
+          todayPnL += qty * (currentPrice - previousClose);
+        }
+      });
     }
-
-    const quote = result.value;
-
-    const qty = Number(stock.quantity) || 0;
-    const avg = Number(stock.avg_price) || 0;
-
-   if (!quote || quote.regularMarketPrice == null) {
-  console.log("No price data for:", stock.symbol);
-  return;
-}
-
-const currentPrice = Number(quote.regularMarketPrice);
-const previousClose = Number(quote.regularMarketPreviousClose);
-
-    totalInvestment += qty * avg;
-    currentValue += qty * currentPrice;
-
-    if (previousClose) {
-      todayPnL += qty * (currentPrice - previousClose);
-    }
-  });
-}
-
-    totalInvestment = Number(totalInvestment) || 0;
-    currentValue = Number(currentValue) || 0;
-    todayPnL = Number(todayPnL) || 0;
 
     const totalPnL = currentValue - totalInvestment;
     const totalPnLPercent =
       totalInvestment > 0 ? (totalPnL / totalInvestment) * 100 : 0;
 
-    // include wallet object so frontend can show current balance
     return res.json({
       wallet,
       totalInvestment,
@@ -171,7 +161,6 @@ const previousClose = Number(quote.regularMarketPreviousClose);
       totalPnLPercent,
       todayPnL,
     });
-
 
   } catch (err) {
     console.error("❌ Summary error:", err.message);

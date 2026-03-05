@@ -8,6 +8,8 @@ const Summary = () => {
   useEffect(() => {
     if (!loading && user) {
       fetchSummary();
+      const intervalId = setInterval(fetchSummary, 3000);
+      return () => clearInterval(intervalId);
     }
   }, [loading, user]);
 
@@ -38,9 +40,10 @@ const Summary = () => {
     totalPnLPercent,
     todayPnL
   } = summary;
+  
 
-  const isProfit = totalPnL >= 0;
-  const isTodayProfit = todayPnL >= 0;
+  const pnlClass = totalPnL > 0 ? "profit" : totalPnL < 0 ? "loss" : "";
+  const todayPnlClass = todayPnL > 0 ? "profit" : todayPnL < 0 ? "loss" : "";
 
   return (
     <div className="summary-container">
@@ -69,15 +72,15 @@ const Summary = () => {
 
           <div>
             <span>Total P&L</span>
-            <h4 className={isProfit ? "profit" : "loss"}>
-              ₹ {totalPnL?.toLocaleString()} ({totalPnLPercent?.toFixed(2)}%)
+            <h4 className={pnlClass}>
+              {totalPnL > 0 ? "+" : ""}₹ {totalPnL?.toLocaleString()} ({totalPnL > 0 ? "+" : ""}{totalPnLPercent?.toFixed(2)}%)
             </h4>
           </div>
 
           <div>
             <span>Today's P&L</span>
-            <h4 className={isTodayProfit ? "profit" : "loss"}>
-              ₹ {todayPnL?.toLocaleString()}
+            <h4 className={todayPnlClass}>
+              {todayPnL > 0 ? "+" : ""}₹ {todayPnL?.toLocaleString()}
             </h4>
           </div>
         </div>

@@ -2,16 +2,11 @@ import express from "express";
 import supabase from "../supabaseAdmin.js";
 import YahooFinance from "yahoo-finance2";
 
-const yahooFinance = new YahooFinance();
+const yahooFinance = new YahooFinance({
+  suppressNotices: ["yahooSurvey"],
+});
 
 const router = express.Router();
-
-// const PRICE_MAP = {
-//   INFY: 1555.45,
-//   TCS: 3194.8,
-//   KPITTECH: 266.45,
-//   ONGC: 116.8,
-// };
 
 router.get("/:userId", async (req, res) => {
   try {
@@ -30,7 +25,12 @@ router.get("/:userId", async (req, res) => {
         const qty = Number(h.quantity);
 
         //  Add .NS for NSE stocks
-        const quote = await yahooFinance.quote(`${h.symbol}.NS`);
+        let quote = {};
+        try {
+          quote = await yahooFinance.quote(`${h.symbol}.NS`);
+        } catch (e) {
+          console.error(`Failed to fetch holding quote for ${h.symbol}:`, e.message);
+        }
 
         const ltp = quote.regularMarketPrice || avg;
 

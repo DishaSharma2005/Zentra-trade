@@ -9,14 +9,22 @@ const Holdings = () => {
     if (!user) return;
 
     const fetchHoldings = async () => {
-      const res = await fetch(
-        `http://localhost:5000/api/holdings/${user.id}`
-      );
-      const data = await res.json();
-      setHoldings(data);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/holdings/${user.id}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setHoldings(data);
+        }
+      } catch (e) {
+        console.error("Failed to fetch holdings", e);
+      }
     };
 
     fetchHoldings();
+    const intervalId = setInterval(fetchHoldings, 3000);
+    return () => clearInterval(intervalId);
   }, [user]);
 
   return (
@@ -49,11 +57,11 @@ const Holdings = () => {
                 <td>₹{h.current.toFixed(2)}</td>
                 <td
                   style={{
-                    color: h.pnl >= 0 ? "green" : "red",
+                    color: h.pnl > 0 ? "green" : h.pnl < 0 ? "red" : "inherit",
                     fontWeight: 600,
                   }}
                 >
-                  ₹{h.pnl.toFixed(2)} ({h.pnlPercent}%)
+                  {h.pnl > 0 ? "+" : ""}₹{h.pnl.toFixed(2)} ({h.pnl > 0 ? "+" : ""}{h.pnlPercent}%)
                 </td>
               </tr>
             ))}

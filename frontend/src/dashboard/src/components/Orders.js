@@ -8,6 +8,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancelling, setCancelling] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -40,27 +41,39 @@ const Orders = () => {
     fetchOrders();
   }, [user]);
 
+  // Auto-refresh when there are PENDING orders
+  useEffect(() => {
+    const hasPending = orders.some((o) => o.status === "PENDING");
+    let intervalId;
+    if (hasPending) {
+      intervalId = setInterval(() => {
+        fetchOrders(); // This will pull the latest status and update if it has changed
+      }, 2000); // Check every 2 seconds
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [orders]);
+
   const handleCancelOrder = async (orderId) => {
-    if (window.confirm("Are you sure you want to cancel this order?")) {
-      try {
-        setCancelling(orderId);
-        const res = await fetch(
-          `http://localhost:5000/api/orders/${orderId}`,
-          { method: "DELETE" }
-        );
+    try {
+      setCancelling(orderId);
+      const res = await fetch(
+        `http://localhost:5000/api/orders/${orderId}`,
+        { method: "DELETE" }
+      );
 
-        if (!res.ok) {
-          throw new Error("Failed to cancel order");
-        }
-
-        setOrders(orders.filter(o => o.id !== orderId));
-        toast.success("Order cancelled successfully");
-      } catch (err) {
-        console.error("Cancel order error:", err.message);
-        toast.error("Failed to cancel order: " + err.message);
-      } finally {
-        setCancelling(null);
+      if (!res.ok) {
+        throw new Error("Failed to cancel order");
       }
+
+      toast.success("Order cancelled successfully");
+      fetchOrders();
+    } catch (err) {
+      console.error("Cancel order error:", err.message);
+      toast.error("Failed to cancel order: " + err.message);
+    } finally {
+      setCancelling(null);
     }
   };
 
@@ -107,6 +120,12 @@ const Orders = () => {
         </button>
       </div>
 
+      <div className="status-legend">
+        <span className="legend-item"><span className="badge-pending">⏳ PENDING</span> Awaiting execution</span>
+        <span className="legend-item"><span className="badge-completed">✓ COMPLETED</span> Transacted successfully</span>
+        <span className="legend-item"><span className="badge-cancelled">✗ CANCELLED</span> Cancelled by user</span>
+      </div>
+
       <div className="order-table">
         <table>
           <thead>
@@ -141,10 +160,12 @@ const Orders = () => {
                   <span
                     className={
                       order.status === "PENDING"
-                        ? "order-pending"
+                        ? "badge-pending"
                         : order.status === "COMPLETED"
-                        ? "order-completed"
-                        : "order-cancelled"
+                        ? "badge-completed"
+                        : order.status === "CANCELLED"
+                        ? "badge-cancelled"
+                        : "badge-default"
                     }
                   >
                     {order.status === "PENDING" && "⏳ " }
