@@ -1,181 +1,112 @@
 import express from "express";
 import supabase from "../supabaseAdmin.js";
 import { calculatePortfolioSummary } from "../services/portfolioService.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const router = express.Router();
 
+// Initialize Gemini (fallback to dummy key to prevent crash if backend starts without it)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "missing_key");
+
 router.post("/", async (req, res) => {
-  const { message, userId } = req.body;
+  const { history, userId } = req.body;
 
-  if (!message || !userId) {
-    return res.status(400).json({ error: "Message and userId required" });
+  if (!history || !Array.isArray(history) || !userId) {
+    return res.status(400).json({ error: "history array and userId required" });
   }
-
-  const lowerMsg = message.toLowerCase();
-
-  const contains = (keywords) =>
-    keywords.some((word) => lowerMsg.includes(word));
 
   try {
-    // =========================
-    //  WALLET
-    // =========================
-    if (contains(["wallet", "balance", "money"])) {
-      const { data, error } = await supabase
-        .from("wallets")
-        .select("balance")
-        .eq("user_id", userId)
-        .single();
+    // 1. Fetch User Data for RAG Context
+    const { data: wallet } = await supabase
+      .from("wallets")
+      .select("balance")
+      .eq("user_id", userId)
+      .single();
 
-      if (error) throw error;
+    const summary = await calculatePortfolioSummary(userId);
 
-      return res.json({
-        reply: `💰 Your wallet balance is ₹${Number(
-          data.balance
-        ).toFixed(2)}`
+    const { data: orders } = await supabase
+      .from("orders")
+      .select("symbol, qty, price, type, status, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    // 2. Construct System Prompt
+    const systemPrompt = `You are an expert financial advisor AI for a stock trading platform. 
+You are talking to a user about their portfolio. Be concise, professional, and helpful. Use Markdown formatting.
+Here is the user's current live financial profile:
+- Wallet Balance: ₹${wallet ? Number(wallet.balance).toFixed(2) : 0}
+- Total Portfolio Investment: ₹${summary.totalInvestment?.toFixed(2) || 0}
+- Current Portfolio Value: ₹${summary.currentValue?.toFixed(2) || 0}
+- Total Profit & Loss: ₹${summary.totalPnL?.toFixed(2) || 0} (${summary.totalPnLPercent?.toFixed(2) || 0}%)
+- Today's Profit & Loss: ₹${summary.todayPnL?.toFixed(2) || 0}
+- Best Stock: ${summary.bestStock || "None"} (Profit: ₹${summary.bestProfit?.toFixed(2) || 0})
+- Worst Stock: ${summary.worstStock || "None"} (Loss: ₹${summary.worstLoss?.toFixed(2) || 0})
+
+Recent Orders (Last 5):
+${orders && orders.length > 0 ? orders.map(o => `- ${o.type} ${o.qty}x ${o.symbol} @ ₹${o.price} (${o.status})`).join('\n') : "None"}
+
+IMPORTANT RULES:
+- If the user asks general financial questions (like what is SIP, how to diversify), answer them helpfully.
+- If the user asks about their specific portfolio, analyze the provided data context and give tailored advice.
+- Never invent portfolio data. Only use the numbers provided above.
+- You are chatting in a small popup widget, so keep responses concise (1-3 small paragraphs max) and use bullet points when enumerating.`;
+
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "missing_key") {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
       });
+      res.write(`data: ${JSON.stringify({ text: "⚠️ **Setup Required:** Please add your `GEMINI_API_KEY` to the `backend/.env` file and restart the backend server to enable the AI Financial Advisor." })}\n\n`);
+      res.write("data: [DONE]\n\n");
+      return res.end();
     }
 
-    // =========================
-    //  PORTFOLIO SUMMARY
-    // =========================
-    if (contains(["portfolio", "investment", "summary"])) {
-      const summary = await calculatePortfolioSummary(userId);
-
-      if (!summary || summary.totalInvestment === 0) {
-        return res.json({
-          reply: "You don't have any holdings yet."
-        });
-      }
-
-      return res.json({
-        reply: `
-📊 Portfolio Overview:
-
-💰 Invested: ₹${summary.totalInvestment.toFixed(2)}
-📈 Current Value: ₹${summary.currentValue.toFixed(2)}
-📊 Total P&L: ₹${summary.totalPnL.toFixed(2)}
-📉 Today's P&L: ₹${summary.todayPnL.toFixed(2)}
-📈 Return: ${summary.totalPnLPercent.toFixed(2)}%
-`
-      });
-    }
-
-    // =========================
-    //  PROFIT / LOSS
-    // =========================
-    if (contains(["profit", "loss", "gain", "p&l"])) {
-      const summary = await calculatePortfolioSummary(userId);
-
-      if (!summary || summary.totalInvestment === 0) {
-        return res.json({
-          reply: "You don't have any holdings yet."
-        });
-      }
-
-      return res.json({
-        reply: `📊 Your total P&L is ₹${summary.totalPnL.toFixed(
-          2
-        )} (${summary.totalPnLPercent.toFixed(2)}%)`
-      });
-    }
-
-    // =========================
-    //  TODAY'S PERFORMANCE
-    // =========================
-    if (contains(["today"])) {
-      const summary = await calculatePortfolioSummary(userId);
-
-      if (!summary || summary.currentValue === 0) {
-        return res.json({
-          reply: "You don't have any holdings yet."
-        });
-      }
-
-      return res.json({
-        reply: `📉 Today's P&L: ₹${summary.todayPnL.toFixed(2)}`
-      });
-    }
-
-    // =========================
-    //  BEST STOCK
-    // =========================
-    if (contains(["best", "top"])) {
-      const summary = await calculatePortfolioSummary(userId);
-
-      if (!summary.bestStock) {
-        return res.json({
-          reply: "You don't have any holdings yet."
-        });
-      }
-
-      return res.json({
-        reply: `🏆 Best performing stock: ${summary.bestStock}
-Profit: ₹${summary.bestProfit.toFixed(2)}`
-      });
-    }
-
-    // =========================
-    //  WORST STOCK
-    // =========================
-    if (contains(["worst"])) {
-      const summary = await calculatePortfolioSummary(userId);
-
-      if (!summary.worstStock) {
-        return res.json({
-          reply: "You don't have any holdings yet."
-        });
-      }
-
-      return res.json({
-        reply: `📉 Worst performing stock: ${summary.worstStock}
-Loss: ₹${summary.worstLoss.toFixed(2)}`
-      });
-    }
-
-    // =========================
-    // 📑 LAST 5 ORDERS
-    // =========================
-    if (contains(["orders","order", "trades"])) {
-  const { data, error } = await supabase
-    .from("orders")
-    .select("symbol, qty, price, type, status, created_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  if (error) throw error;
-
-  if (!data || data.length === 0) {
-    return res.json({
-      reply: "You have no orders yet."
+    // 3. Call Gemini Model
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      systemInstruction: systemPrompt 
     });
-  }
 
-  const orderText = data
-    .map(
-      (o) =>
-        `${o.symbol} | ${o.type?.toUpperCase()} | ${o.qty} shares @ ₹${o.price} (${o.status})`
-    )
-    .join("\n");
+    const contents = history.slice(-10).map((msg) => ({
+      role: msg.sender === "user" ? "user" : "model",
+      parts: [{ text: msg.text }],
+    }));
 
-  return res.json({
-    reply: `📑 Your last 5 orders:\n\n${orderText}`
-  });
-}
-    // =========================
-    // ❓ DEFAULT
-    // =========================
-    return res.json({
-      reply:
-        "I can help with portfolio, profit, today's performance, wallet balance, best/worst stock, or recent orders."
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
     });
+
+    const result = await model.generateContentStream({ contents });
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+    }
+
+    res.write("data: [DONE]\n\n");
+    res.end();
 
   } catch (err) {
-    console.error("Chat Error:", err);
-    return res.status(500).json({
-      error: "Something went wrong"
-    });
+    console.error("Chat Error:", err.message);
+    if (!res.headersSent) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      });
+    }
+    
+    if (err.message.includes("API key not valid")) {
+       res.write(`data: ${JSON.stringify({ text: "⚠️ **Invalid API Key:** The Gemini API key in your `.env` file appears to be invalid. Please check it and restart the server." })}\n\n`);
+    } else {
+       res.write(`data: ${JSON.stringify({ text: "⚠️ **Error:** Something went wrong connecting to the AI." })}\n\n`);
+    }
+    res.write("data: [DONE]\n\n");
+    res.end();
   }
 });
 
