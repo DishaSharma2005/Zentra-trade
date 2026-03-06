@@ -31,6 +31,29 @@ const Transactions = () => {
     fetchTransactions();
   }, [user]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(25);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  
+  const currentTransactions = isMobile 
+    ? transactions.slice(indexOfFirstItem, indexOfLastItem)
+    : transactions;
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (loading) return <p>Loading transactions...</p>;
 
   return (
@@ -52,7 +75,7 @@ const Transactions = () => {
           </thead>
 
           <tbody>
-            {transactions.map((t) => (
+            {currentTransactions.map((t) => (
               <tr key={t.id}>
                 <td>
                   {new Date(t.created_at).toLocaleDateString()}
@@ -88,6 +111,26 @@ const Transactions = () => {
           </tbody>
         </table>
       </div>
+
+      {isMobile && totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <i className="fa fa-chevron-left"></i> Prev
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next <i className="fa fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
     </>
   );
 };

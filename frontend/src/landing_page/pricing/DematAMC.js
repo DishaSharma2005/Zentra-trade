@@ -1,7 +1,7 @@
 function DematAMC() {
   return (
-    <div className="mb-5">
-      <h4 className="mb-3">Demat AMC (Annual Maintenance Charge)</h4>
+    <div className="mb-5 table-responsive">
+      <h4 className="mb-3 fs-5 fs-md-4">Demat AMC (Annual Maintenance Charge)</h4>
 
       <table className="table table-bordered">
         <thead className="table-light">

@@ -8,7 +8,7 @@ const Summary = () => {
   useEffect(() => {
     if (!loading && user) {
       fetchSummary();
-      const intervalId = setInterval(fetchSummary, 3000);
+      const intervalId = setInterval(fetchSummary, 1500);
       return () => clearInterval(intervalId);
     }
   }, [loading, user]);

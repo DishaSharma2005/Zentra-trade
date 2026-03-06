@@ -27,6 +27,29 @@ const Holdings = () => {
     return () => clearInterval(intervalId);
   }, [user]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const totalPages = Math.ceil(holdings.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  
+  const currentHoldings = isMobile 
+    ? holdings.slice(indexOfFirstItem, indexOfLastItem)
+    : holdings;
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       <h3 className="title">Holdings ({holdings.length})</h3>
@@ -46,7 +69,7 @@ const Holdings = () => {
           </thead>
 
           <tbody>
-            {holdings.map((h) => (
+            {currentHoldings.map((h) => (
               <tr key={h.id}>
                 <td>{h.symbol}</td>
                 <td>{h.quantity}</td>
@@ -66,9 +89,28 @@ const Holdings = () => {
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
+
+      {isMobile && totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <i className="fa fa-chevron-left"></i> Prev
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next <i className="fa fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
     </>
   );
 };

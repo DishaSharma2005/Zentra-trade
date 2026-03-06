@@ -10,9 +10,9 @@ const Orders = () => {
   const [cancelling, setCancelling] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await fetch(
         `http://localhost:5000/api/orders/${user.id}`
       );
@@ -30,15 +30,25 @@ const Orders = () => {
       setError(null);
     } catch (err) {
       console.error("Order fetch error:", err.message);
-      setError(err.message);
+      if (!silent) setError(err.message);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!user) return;
+    
+    // Initial load
     fetchOrders();
+
+    // Regular background polling (every 3 seconds)
+    // This allows new orders placed from the watchlist to show up automatically
+    const intervalId = setInterval(() => {
+      fetchOrders(true);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
   }, [user]);
 
   // Auto-refresh when there are PENDING orders
@@ -75,6 +85,32 @@ const Orders = () => {
     } finally {
       setCancelling(null);
     }
+  };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+
+  // Logic for mobile-only pagination
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  
+  // Only slice if on mobile
+  const currentOrders = isMobile 
+    ? orders.slice(indexOfFirstItem, indexOfLastItem)
+    : orders;
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -142,7 +178,7 @@ const Orders = () => {
           </thead>
 
           <tbody>
-            {orders.map((order) => (
+            {currentOrders.map((order) => (
               <tr key={order.id}>
                 <td className="align-left">
                   <strong>{order.symbol}</strong>
@@ -199,6 +235,26 @@ const Orders = () => {
           </tbody>
         </table>
       </div>
+
+      {isMobile && totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <i className="fa fa-chevron-left"></i> Prev
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next <i className="fa fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
     </>
   );
 };

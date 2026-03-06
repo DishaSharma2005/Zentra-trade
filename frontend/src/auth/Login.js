@@ -33,6 +33,7 @@ function Login() {
 
   return (
     <div
+      className="auth-container"
       style={{
         minHeight: "80vh",
         display: "flex",
@@ -42,7 +43,7 @@ function Login() {
       }}
     >
       {/* Left Image Section */}
-      <div style={{ flex: 1, paddingRight: "2rem" }}>
+      <div className="auth-left" style={{ flex: 1, paddingRight: "2rem" }}>
         <img
           src="/media/images/signup.png"
           alt="Login Visual"
@@ -55,7 +56,7 @@ function Login() {
       </div>
 
       {/* Right Login Form */}
-      <div style={{ flex: 1, maxWidth: "400px" }}>
+      <div className="auth-right" style={{ flex: 1, maxWidth: "400px" }}>
         <h2 style={{ marginBottom: "1.5rem" }}>Login</h2>
 
         <form

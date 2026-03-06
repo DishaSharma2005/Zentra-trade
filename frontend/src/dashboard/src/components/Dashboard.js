@@ -1,5 +1,5 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import "../index.css";
 import TopBar from "./TopBar";
 
@@ -13,11 +13,25 @@ import PaymentSuccess from "./payments/PaymentSuccess";
 import PaymentCancel from "./payments/PaymentCancel";
 
 const Dashboard = ({ onAddFunds }) => {
+  const location = useLocation();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isSummaryPage = location.pathname === "/dashboard" || location.pathname === "/dashboard/";
+  
+  // Show watchlist if it's NOT mobile (Desktop view) OR if it's the main summary page
+  const shouldShowWatchlist = !isMobile || isSummaryPage;
+
   return (
     <>
     {/* <TopBar />   */}
     <div className="dashboard-container">
-      <WatchList />
+      {shouldShowWatchlist && <WatchList />}
 
       <div className="content">
         <Routes>

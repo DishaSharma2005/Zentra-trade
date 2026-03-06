@@ -59,30 +59,29 @@ export const calculatePortfolioSummary = async (userId) => {
   let worstLoss = Infinity;
 
   // ===============================
-  //  3. Fetch Market Quotes
+  //  3. Fetch Market Quotes (Batch)
   // ===============================
-  const quotePromises = holdings.map((stock) =>
-    yahooFinance.quote(`${stock.symbol}.NS`).catch((err) => {
-      // Catch silently or log softly to prevent Unhandled Promise Rejection
-      console.error(`Failed to fetch quote for ${stock.symbol}:`, err.message);
-      return null;
-    })
-  );
+  const symbolsToFetch = holdings.map((h) => `${h.symbol}.NS`);
+  let quotes = [];
 
-  const quotes = await Promise.allSettled(quotePromises);
+  try {
+    const rawQuotes = await yahooFinance.quote(symbolsToFetch);
+    quotes = Array.isArray(rawQuotes) ? rawQuotes : [rawQuotes];
+  } catch (err) {
+    console.error("Batch fetch failed for portfolio summary:", err.message);
+    // If entire batch fails, quotes remains empty array, calculations will handle it
+  }
 
   // ===============================
   //  4. Calculate Current Values
   // ===============================
-  holdings.forEach((stock, index) => {
-    const result = quotes[index];
+  holdings.forEach((stock) => {
+    const quote = quotes.find(q => q.symbol === `${stock.symbol}.NS`);
 
-    if (result.status !== "fulfilled" || !result.value) {
-      console.log("Skipping symbol due to fetch failure:", stock.symbol);
+    if (!quote) {
+      console.log("Skipping symbol due to fetch failure or missing quote:", stock.symbol);
       return;
     }
-
-    const quote = result.value;
 
     const qty = Number(stock.quantity) || 0;
     const avg = Number(stock.avg_price) || 0;

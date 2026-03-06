@@ -25,7 +25,7 @@ function Universe() {
 
       {/* FIRST ROW */}
       <div className="row mt-5">
-        <div className="col-md-4 mb-4">
+        <div className="col-12 col-md-4 mb-5 mb-md-4">
           <div style={logoBoxStyle}>
             <img
               src="media/images/zerodhaFundhouse.png"
@@ -39,7 +39,7 @@ function Universe() {
           </p>
         </div>
 
-        <div className="col-md-4 mb-4">
+        <div className="col-12 col-md-4 mb-5 mb-md-4">
           <div style={logoBoxStyle}>
             <img
               src="media/images/sensibullLogo.svg"
@@ -70,7 +70,7 @@ function Universe() {
 
       {/* SECOND ROW */}
       <div className="row mt-4">
-        <div className="col-md-4 mb-4">
+        <div className="col-12 col-md-4 mb-5 mb-md-4">
           <div style={logoBoxStyle}>
             <img
               src="media/images/streakLogo.png"
@@ -84,7 +84,7 @@ function Universe() {
           </p>
         </div>
 
-        <div className="col-md-4 mb-4">
+        <div className="col-12 col-md-4 mb-5 mb-md-4">
           <div style={logoBoxStyle}>
             <img
               src="media/images/smallcaseLogo.png"
@@ -98,7 +98,7 @@ function Universe() {
           </p>
         </div>
 
-        <div className="col-md-4 mb-4">
+        <div className="col-12 col-md-4 mb-5 mb-md-4">
           <div style={logoBoxStyle}>
             <img
               src="media/images/dittoLogo.png"

@@ -44,6 +44,15 @@
   transform-origin: bottom right;
 }
 
+@media (max-width: 768px) {
+  .chat-container {
+    width: 90vw;
+    right: 5vw;
+    height: 50vh;
+    bottom: 90px;
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

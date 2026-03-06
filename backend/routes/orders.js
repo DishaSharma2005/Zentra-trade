@@ -100,14 +100,18 @@ router.post("/", async (req, res) => {
 
     // 🟢 SIMULATE DELAY: Complete the trade after 8 seconds
     setTimeout(async () => {
-      // Check if order was cancelled before completing
+      // 🚨 CRITICAL PROTECTION: Re-fetch the order to ensure it's still PENDING.
+      // If it was cancelled by the user during this 8s window, ABORT.
       const { data: currentOrder } = await supabase
         .from("orders")
-        .select("status")
+        .select("*")
         .eq("id", order.id)
         .single();
         
-      if (currentOrder && currentOrder.status === "CANCELLED") return;
+      if (!currentOrder || currentOrder.status !== "PENDING") {
+        console.log(`⚠️ Aborting completion for order ${order.id}. Status is ${currentOrder?.status || 'UNKNOWN'}`);
+        return;
+      }
 
       if (type === "BUY") {
         // Complete BUY: give user their new holdings

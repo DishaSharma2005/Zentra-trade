@@ -5,7 +5,7 @@ function Awards() {
     <div className="container py-5 my-5">
       <div className="row align-items-center">
         {/* Left Section - Image */}
-        <div className="col-md-6 mb-4 mb-md-0">
+        <div className="col-12 col-md-6 mb-4 mb-md-0 text-center">
           <img
             src="media/images/largestBroker.svg"
             alt="Largest Stock Broker Illustration"
@@ -14,8 +14,8 @@ function Awards() {
         </div>
 
         {/* Right Section - Text and Details */}
-        <div className="col-md-6">
-          <h2 className="fw-semibold mb-3">Largest Stock Broker in India</h2>
+        <div className="col-12 col-md-6 text-center text-md-start">
+          <h2 className="fw-semibold mb-3 fs-3 fs-md-2">Largest Stock Broker in India</h2>
           <p className="mb-4 text-muted">
             Over <strong>2 million Zerodha clients</strong> contribute to more
             than <strong>15%</strong> of all retail order volumes in India daily

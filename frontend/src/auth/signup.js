@@ -30,9 +30,9 @@ function Signup() {
   };
 
   return (
-    <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+    <div className="auth-container" style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
       {/* Left Image Section */}
-      <div style={{ flex: 1, paddingRight: "2rem" }}>
+      <div className="auth-left" style={{ flex: 1, paddingRight: "2rem" }}>
         <img
           src="/media/images/signup.png"
           alt="Signup Visual"
@@ -42,7 +42,7 @@ function Signup() {
       </div>
 
       {/* Right Signup Form */}
-      <div style={{ flex: 1, maxWidth: "400px" }}>
+      <div className="auth-right" style={{ flex: 1, maxWidth: "400px" }}>
         <h2 style={{ marginBottom: "1.5rem" }}>Signup Now</h2>
 
         <form onSubmit={handleEmailSignup} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>

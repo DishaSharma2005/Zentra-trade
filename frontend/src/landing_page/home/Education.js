@@ -5,7 +5,7 @@ function Education() {
     <div className="container py-5">
       <div className="row align-items-center">
         {/* Left Section - Image */}
-        <div className="col-md-5 mb-4 mb-md-0">
+        <div className="col-12 col-md-5 mb-4 mb-md-0 text-center">
           <img
             src="media/images/education.svg"
             alt="Stock Market Education Illustration"
@@ -14,10 +14,10 @@ function Education() {
         </div>
 
         {/* Spacer Column */}
-        <div className="col-md-1"></div>
+        <div className="d-none d-md-block col-md-1"></div>
 
         {/* Right Section - Text */}
-        <div className="col-md-6">
+        <div className="col-12 col-md-6 text-center text-md-start">
           <h2 className="mb-4 fw-semibold">
             Free and Open Market Education
           </h2>

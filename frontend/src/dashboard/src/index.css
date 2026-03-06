@@ -12,12 +12,37 @@ code {
     monospace;
 }
 
+/* Dashboard Layout */
 .dashboard-container {
-  width: 100%;
-  height: 90vh;
   display: flex;
-  align-items: center;
-  box-sizing: border-box;
+  height: calc(100vh - 65px);
+  /* Header height approx */
+  background: var(--bg-color);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .watchlist-container {
+    flex-basis: auto;
+    width: 100%;
+    max-height: 400px;
+    height: 400px;
+    border-left: none;
+    border-bottom: 1px solid rgb(224, 224, 224);
+  }
+
+  .content {
+    flex-basis: auto;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 .content {
@@ -26,6 +51,19 @@ code {
   box-sizing: border-box;
   overflow-y: auto;
   padding: 3% 2%;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  /* Add min-width to force horizontal scroll on small devices instead of squishing */
+  min-width: 600px;
 }
 
 .funds {
@@ -328,6 +366,10 @@ code {
   cursor: pointer;
 }
 
+.hamburger-icon {
+  display: none;
+}
+
 .menu-container {
   flex: 1;
   height: 100%;
@@ -391,34 +433,135 @@ hr {
   height: 30px;
 }
 
-.profile {
+.right-actions {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  margin-left: 20px;
+  gap: 20px;
 }
 
-.profile .avatar {
-  width: 30px;
-  height: 30px;
-  text-align: center;
+.desktop-only {
+  display: inline;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+}
+
+.profile-wrapper {
   position: relative;
-  font-size: 0.7rem;
-  font-weight: 400;
-  color: rgb(221, 139, 221);
-  justify-content: center;
-  align-items: center;
-  border-radius: 100%;
-  text-align: center;
-  display: flex;
-  background: rgb(252, 229, 252);
-  margin-right: 8px;
+  cursor: pointer;
 }
 
-.profile .username {
-  font-size: 0.8rem;
-  font-weight: 300;
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: background 0.2s;
 }
+
+.profile-trigger:hover {
+  background: #f5f5f5;
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  background: #1e2230;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.profile-name {
+  font-size: 0.85rem;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Enhanced Profile Dropdown Card */
+.profile-dropdown-card {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 240px;
+  background: #1e2230;
+  /* Darker, premium background */
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeInDown 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar.large {
+  width: 48px;
+  height: 48px;
+  background: #30364d;
+  font-size: 1.2rem;
+}
+
+.profile-card-header strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.profile-card-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #a0a7bc;
+}
+
+.profile-dropdown-card hr {
+  border: none;
+  border-top: 1px solid #30364d;
+  margin: 15px 0;
+  height: 0;
+}
+
+.logout-item {
+  color: #ff5252;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: center;
+}
+
+.logout-item:hover {
+  background: rgba(255, 82, 82, 0.1);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* sudo selectors */
 
@@ -733,6 +876,15 @@ hr {
   padding: 0 20px;
 }
 
+@media (max-width: 768px) {
+  .topbar-container {
+    height: auto;
+    min-height: 10vh;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+}
+
 
 .indices-container {
   flex-basis: 32%;
@@ -743,6 +895,16 @@ hr {
   display: flex;
   align-items: center;
   justify-content: space-around;
+}
+
+@media (max-width: 768px) {
+  .indices-container {
+    flex-basis: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgb(224, 224, 224);
+    justify-content: space-between;
+    padding: 10px 5px;
+  }
 }
 
 .nifty {
@@ -765,12 +927,28 @@ hr {
   margin-right: 8px;
 }
 
+.percent.up {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.percent.down {
+  color: #f44336;
+  font-weight: 500;
+}
+
 .index {
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
   color: rgb(97, 97, 97);
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .index {
+    font-size: 0.7rem;
+  }
 }
 
 .index-points {
@@ -823,6 +1001,19 @@ hr {
   align-items: center;
   background: #f9fafb;
   font-weight: 500;
+}
+
+.watchlist-item .item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .watchlist-item .item {
+    flex-wrap: wrap;
+  }
 }
 
 .header h3 {
@@ -1081,6 +1272,10 @@ hr {
 .greeting {
   margin-bottom: 20px;
   animation: slideInDown 0.5s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .greeting h4 {
@@ -1257,6 +1452,26 @@ hr {
 .order-sell {
   color: rgb(250, 118, 78);
   font-weight: 500;
+}
+
+.watchlist-item .actions {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  right: 0;
+  background: var(--hover-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .watchlist-item .actions {
+    position: static;
+    margin-top: 8px;
+    width: 100%;
+    justify-content: flex-end;
+    background: transparent;
+  }
 }
 
 .order-completed {
@@ -1478,7 +1693,7 @@ hr {
   border-left: 4px solid rgb(244, 67, 54);
   color: rgb(244, 67, 54);
   padding: 12px 15px;
-  border-radius: 4px;
+  border-radius: 44px;
   font-size: 0.9rem;
   margin-bottom: 20px;
   animation: shake 0.3s ease-in-out;
@@ -1502,6 +1717,51 @@ hr {
 
 .form-actions {
   margin-bottom: 20px;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #fdfdfd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.pagination-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  color: #444;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #ccc;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9f9f9;
+}
+
+.pagination-btn i {
+  font-size: 0.8rem;
 }
 
 .btn-submit {
@@ -1539,6 +1799,11 @@ hr {
   margin: 0;
 }
 
+.order-table {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
 .modal-close {
   margin-top: 20px;
   background: transparent;
@@ -1552,6 +1817,26 @@ hr {
 
 .modal-close:hover {
   background: rgb(245, 245, 245);
+}
+
+/* Watchlist specific */
+.watchlist-container {
+  width: 380px;
+  background: white;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .watchlist-container {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    max-height: 40vh;
+    /* take up some portion, not all */
+  }
 }
 
 .payment-result-container {
@@ -1664,5 +1949,243 @@ hr {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* =========================================
+   RESPONSIVE DESIGN (Tablets & Mobile)
+   ========================================= */
+
+/* Tablets (iPad, etc.) */
+@media screen and (max-width: 1024px) {
+  .dashboard-container {
+    flex-wrap: wrap;
+  }
+
+  .content {
+    flex-basis: 75%;
+  }
+
+  .watchlist-container {
+    flex-basis: 25%;
+  }
+
+  .topbar-container {
+    padding: 0 10px;
+  }
+
+  .indices-container {
+    padding: 10px 5px;
+  }
+
+  .index {
+    font-size: 0.7rem;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .col {
+    flex-basis: 48%;
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile Phones (< 768px) */
+@media screen and (max-width: 768px) {
+
+  /* Show Watchlist on Mobile */
+  .watchlist-container {
+    display: flex !important;
+    background: #ffffff;
+    flex-basis: auto;
+    width: 100%;
+    max-height: 450px;
+    height: 450px;
+    border-left: none;
+    border-bottom: 1px solid rgb(224, 224, 224);
+    z-index: 10;
+  }
+
+  /* Expand Content to full width */
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 90vh;
+  }
+
+  .content {
+    flex-basis: 100%;
+    width: 100%;
+    padding: 15px 10px;
+  }
+
+  /* Compact Topbar & Navigation */
+  .topbar-container {
+    height: auto;
+    min-height: 60px;
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+
+  .indices-container {
+    display: none !important;
+    /* Hide Nifty/Sensex to save space */
+  }
+
+  .menu-container {
+    width: 100%;
+    padding: 5px;
+    justify-content: space-between;
+  }
+
+  .logo {
+    width: 45px;
+  }
+
+  .hamburger-icon {
+    display: block;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #444;
+  }
+
+  .menus {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    padding: 20px;
+    box-sizing: border-box;
+    border-top: 1px solid #eee;
+  }
+
+  .menus.mobile-open {
+    display: flex;
+  }
+
+  .menus ul {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+
+  .menus li {
+    display: block;
+    width: 100%;
+    margin: 0;
+    border-bottom: 1px solid #f9f9f9;
+  }
+
+  .menus li p {
+    padding: 15px 0;
+    margin: 0;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .right-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .add-funds-wrapper {
+    width: 100%;
+  }
+
+  .add-funds-menu {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    margin: 0;
+  }
+
+  .profile-wrapper {
+    width: 100%;
+    padding: 0;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+
+  .profile-trigger {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .profile-dropdown-card {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    padding: 15px 0;
+    border-radius: 0;
+    background: #fbfbfb;
+    margin-top: 10px;
+  }
+
+  /* Make Data Tables scrollable horizontally */
+  .order-table {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .order-table table {
+    min-width: 600px;
+  }
+
+  .table {
+    padding: 15px;
+    overflow-x: auto;
+  }
+
+  /* Stack Dashboard row columns */
+  .row {
+    flex-direction: column;
+  }
+
+  .col {
+    flex-basis: 100%;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .col span {
+    justify-content: center;
+  }
+
+  /* Adjust Dashboard Summary Data */
+  .data {
+    width: 100%;
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .data hr {
+    display: none;
+  }
+
+  .data .first h3 {
+    font-size: 2rem;
+  }
+
+  /* Modals */
+  .add-money-modal {
+    max-width: 90vw;
+    padding: 25px 20px;
   }
 }
