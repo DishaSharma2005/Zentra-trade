@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import "../index.css";
-import TopBar from "./TopBar";
 
 
 import Holdings from "./Holdings";
