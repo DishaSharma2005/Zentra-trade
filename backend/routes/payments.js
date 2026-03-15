@@ -8,7 +8,10 @@ router.post("/create-checkout-session", async (req, res) => {
   const { amount, userId } = req.body;
 
   try {
-    const FRONTEND_URL = process.env.FRONTEND_URL || "https://zentra-trade.vercel.app";
+    const envUrl = process.env.FRONTEND_URL;
+    const FRONTEND_URL = (!envUrl || envUrl.includes("localhost")) 
+      ? "https://zentra-trade.vercel.app" 
+      : envUrl;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
