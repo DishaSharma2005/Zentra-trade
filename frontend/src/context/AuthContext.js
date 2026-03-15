@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -38,9 +39,13 @@ export function AuthProvider({ children }) {
 
     // listen to auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         const newUser = session?.user ?? null;
         setUser(newUser);
+
+        if (event === "SIGNED_IN" && newUser) {
+           toast.success(`Login successful! You can now see the dashboard.`);
+        }
 
         if (newUser) {
           initUserInBackend(newUser);
