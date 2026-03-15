@@ -96,14 +96,68 @@ router.post("/verify-session", async (req, res) => {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const isPaid = session.payment_status === "paid";
 
-    return res.json({
-      success: session.payment_status === "paid",
-    });
+    if (isPaid) {
+      const userId = session.metadata.userId;
+      const amount = session.amount_total / 100;
 
+      // 💳 Check if this payment was ALREADY processed
+      const { data: existingPayment } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("stripe_session_id", sessionId)
+        .single();
+
+      if (!existingPayment) {
+        // Fallback update
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("balance")
+          .eq("user_id", userId)
+          .single();
+
+        if (wallet) {
+          await supabase
+            .from("wallets")
+            .update({ balance: Number(wallet.balance) + amount })
+            .eq("user_id", userId);
+
+          await supabase.from("payments").insert([
+            {
+              user_id: userId,
+              amount,
+              stripe_session_id: sessionId,
+              status: "completed",
+            },
+          ]);
+        }
+      }
+    }
+
+    return res.json({ success: isPaid });
   } catch (err) {
     console.error("verify-session error", err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// GET user payment history
+router.get("/history/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { data: payments, error } = await supabase
+      .from("payments")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("status", "completed")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    res.json(payments);
+  } catch (err) {
+    console.error("Fetch payment history error:", err.message);
+    res.status(500).json({ error: "Failed to fetch payment history" });
   }
 });
 

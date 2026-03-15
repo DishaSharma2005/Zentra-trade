@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 // optional verify via backend if webhook is not yet active
 const verifySession = async (sessionId) => {
   try {
-    const API_URL = process.env.REACT_APP_API_URL;
+    // Fallback to localhost if env var is not set
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
     const res = await fetch((`${API_URL}/api/payments/verify-session`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -107,6 +107,16 @@ const Menu = ({ onAddFunds }) => {
               </p>
             </Link>
           </li>
+          <li>
+            <Link to="/dashboard/funds" style={{ textDecoration: "none" }}>
+              <p
+                className={selectedMenu === 4 ? activeMenuClass : menuClass}
+                onClick={() => handleMenuClick(4)}
+              >
+                Funds
+              </p>
+            </Link>
+          </li>
         </ul>
 
         <div className="right-actions">

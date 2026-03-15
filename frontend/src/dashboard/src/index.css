@@ -2179,6 +2179,18 @@ hr {
     display: none;
   }
 
+  .history-container {
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media screen and (max-width: 768px) {
+    .history-container {
+      padding: 10px;
+    }
+  }
+
   .data .first h3 {
     font-size: 2rem;
   }
