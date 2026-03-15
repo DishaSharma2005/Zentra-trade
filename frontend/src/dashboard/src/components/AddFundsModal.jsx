@@ -19,8 +19,9 @@ const AddFundsModal = ({ onClose }) => {
       setLoading(true);
       setError(null);
 
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
       const res = await fetch(
-        "http://localhost:5000/api/payments/create-checkout-session",
+        `${API_URL}/api/payments/create-checkout-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

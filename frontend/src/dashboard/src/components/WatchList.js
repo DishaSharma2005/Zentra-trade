@@ -22,7 +22,8 @@ const WatchList = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/watchlist/prices", {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_URL}/api/watchlist/prices`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -65,7 +66,8 @@ const WatchListItem = ({ stock }) => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/orders", {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_URL}/api/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

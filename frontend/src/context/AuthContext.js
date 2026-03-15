@@ -10,7 +10,8 @@ export function AuthProvider({ children }) {
   // INIT USER IN BACKEND
   const initUserInBackend = async (user) => {
     try {
-      await fetch("http://localhost:5000/api/user/init", {
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      await fetch(`${API_URL}/api/user/init`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

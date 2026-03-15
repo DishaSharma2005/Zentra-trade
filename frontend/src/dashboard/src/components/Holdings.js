@@ -10,8 +10,9 @@ const Holdings = () => {
 
     const fetchHoldings = async () => {
       try {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
         const res = await fetch(
-          `http://localhost:5000/api/holdings/${user.id}`
+          `${API_URL}/api/holdings/${user.id}`
         );
         if (res.ok) {
           const data = await res.json();

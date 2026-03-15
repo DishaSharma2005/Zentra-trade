@@ -9,7 +9,8 @@ const TopBar = ({ onAddFunds }) => {
 
   const fetchIndices = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/indices");
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_URL}/api/indices`);
       if (res.ok) {
         const data = await res.json();
         setIndices(data);

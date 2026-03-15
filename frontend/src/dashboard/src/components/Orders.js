@@ -13,8 +13,9 @@ const Orders = () => {
   const fetchOrders = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
       const res = await fetch(
-        `http://localhost:5000/api/orders/${user.id}`
+        `${API_URL}/api/orders/${user.id}`
       );
 
       if (!res.ok) {
@@ -68,8 +69,9 @@ const Orders = () => {
   const handleCancelOrder = async (orderId) => {
     try {
       setCancelling(orderId);
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
       const res = await fetch(
-        `http://localhost:5000/api/orders/${orderId}`,
+        `${API_URL}/api/orders/${orderId}`,
         { method: "DELETE" }
       );
 

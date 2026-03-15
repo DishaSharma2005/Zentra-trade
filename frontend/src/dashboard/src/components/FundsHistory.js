@@ -11,7 +11,8 @@ const FundsHistory = () => {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:5000/api/payments/history/${user.id}`);
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_URL}/api/payments/history/${user.id}`);
       if (res.ok) {
         const data = await res.json();
         setHistory(data);

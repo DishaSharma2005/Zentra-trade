@@ -15,8 +15,9 @@ const Summary = () => {
 
   const fetchSummary = async () => {
     try {
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
       const res = await fetch(
-        `http://localhost:5000/api/user/summary/${user.id}`
+        `${API_URL}/api/user/summary/${user.id}`
       );
 
       if (!res.ok) throw new Error("Failed to fetch summary");

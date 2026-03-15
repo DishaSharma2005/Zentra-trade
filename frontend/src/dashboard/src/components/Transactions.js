@@ -11,8 +11,9 @@ const Transactions = () => {
 
     const fetchTransactions = async () => {
       try {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
         const res = await fetch(
-          `http://localhost:5000/api/transactions/${user.id}`
+          `${API_URL}/api/transactions/${user.id}`
         );
 
         if (!res.ok) {
