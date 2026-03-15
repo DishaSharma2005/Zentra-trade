@@ -7,6 +7,7 @@ import {
   Routes,
   Route,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import HomePage from "./landing_page/home/HomePage";
@@ -37,6 +38,16 @@ function AppLayout() {
 
   const openAddFunds = () => setShowAddFunds(true);
   const closeAddFunds = () => setShowAddFunds(false);
+
+  // Fix for Supabase OAuth redirect hashes
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    if (location.hash && location.hash.includes("access_token")) {
+      // Supabase handles the session in the background
+      // We just need to clear the hash and go to the dashboard
+      navigate("/dashboard", { replace: true });
+    }
+  }, [location, navigate]);
 
   return (
     <>
