@@ -8,6 +8,7 @@ router.post("/create-checkout-session", async (req, res) => {
   const { amount, userId } = req.body;
 
   try {
+    const FRONTEND_URL = process.env.FRONTEND_URL || "https://zentra-trade.vercel.app";
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -22,8 +23,8 @@ router.post("/create-checkout-session", async (req, res) => {
         },
       ],
       // keep user inside dashboard so authentication persists
-      success_url: `${process.env.FRONTEND_URL}/dashboard/wallet-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/dashboard/wallet-cancel`,
+      success_url: `${FRONTEND_URL}/dashboard/wallet-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${FRONTEND_URL}/dashboard/wallet-cancel`,
       metadata: { userId },
     });
 
