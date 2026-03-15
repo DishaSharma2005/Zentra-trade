@@ -88,6 +88,7 @@ router.post(
     },
   ]);
 }
+ res.json({ received: true });
   });
 // optional endpoint used by payment-success page to double-check status
 router.post("/verify-session", async (req, res) => {
