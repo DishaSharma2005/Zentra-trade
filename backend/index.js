@@ -19,9 +19,10 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "https://zentra-trade.vercel.app",
       process.env.FRONTEND_URL
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
   })
 );
