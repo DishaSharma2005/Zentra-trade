@@ -57,16 +57,19 @@ const FundsHistory = () => {
             {currentItems.map((item) => (
               <tr key={item.id}>
                 <td className="align-left">
-                  {new Date(item.created_at).toLocaleString("en-IN", {
-                    timeZone: "Asia/Kolkata",
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: true,
-                  })}
+                  {(() => {
+                    const date = new Date(item.created_at);
+                    return date.toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      hour12: true,
+                    });
+                  })()}
                 </td>
                 <td className="order-timestamp">
                   {item.stripe_session_id.substring(0, 16)}...
