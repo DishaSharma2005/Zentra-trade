@@ -16,6 +16,11 @@ dotenv.config();
 
 const app = express();
 
+// --- Health Check (public, before rate limiter — for UptimeRobot / warmup pings) ---
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running" });
+});
+
 // --- Rate Limiting ---
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

@@ -39,7 +39,12 @@ function AppLayout() {
   const openAddFunds = () => setShowAddFunds(true);
   const closeAddFunds = () => setShowAddFunds(false);
 
-
+  //  Warmup ping — wakes the Render backend on first site visit
+  // so it's ready by the time the user needs real API calls.
+  React.useEffect(() => {
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+    fetch(`${API_URL}/health`).catch(() => {}); // silent — never affects UI
+  }, []);
 
   return (
     <>
