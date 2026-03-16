@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import "./ChatBot.css";
+import { authFetch } from "../utils/authFetch";
 
 const ChatBot = ({ userId }) => {
   const [open, setOpen] = useState(false);
@@ -33,11 +34,8 @@ What's on your mind today?`
 
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_URL}/api/chat`, {
+      const response = await authFetch(`${API_URL}/api/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           history: chatHistory.slice(1).map((m) => ({
             sender: m.sender,

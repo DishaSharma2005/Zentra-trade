@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { authFetch } from "../../../utils/authFetch";
 
 const Summary = () => {
   const { user, loading } = useAuth();
@@ -16,7 +17,7 @@ const Summary = () => {
   const fetchSummary = async () => {
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(
+      const res = await authFetch(
         `${API_URL}/api/user/summary/${user.id}`
       );
 

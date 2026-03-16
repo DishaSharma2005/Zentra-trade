@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { authFetch } from "../../../utils/authFetch";
 
 const AddFundsModal = ({ onClose }) => {
   const { user } = useAuth();
@@ -20,11 +21,10 @@ const AddFundsModal = ({ onClose }) => {
       setError(null);
 
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(
+      const res = await authFetch(
         `${API_URL}/api/payments/create-checkout-session`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: Number(amount),
             userId: user.id,

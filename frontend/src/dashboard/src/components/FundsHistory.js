@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { authFetch } from "../../../utils/authFetch";
 
 const FundsHistory = () => {
   const { user } = useAuth();
@@ -12,7 +13,7 @@ const FundsHistory = () => {
     try {
       setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(`${API_URL}/api/payments/history/${user.id}`);
+      const res = await authFetch(`${API_URL}/api/payments/history/${user.id}`);
       if (res.ok) {
         const data = await res.json();
         setHistory(data);

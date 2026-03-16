@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import toast from "react-hot-toast";
+import { authFetch } from "../../../utils/authFetch";
 
 const Orders = () => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ const Orders = () => {
     try {
       if (!silent) setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(
+      const res = await authFetch(
         `${API_URL}/api/orders/${user.id}`
       );
 
@@ -70,7 +71,7 @@ const Orders = () => {
     try {
       setCancelling(orderId);
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(
+      const res = await authFetch(
         `${API_URL}/api/orders/${orderId}`,
         { method: "DELETE" }
       );
