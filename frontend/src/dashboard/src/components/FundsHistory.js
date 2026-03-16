@@ -58,8 +58,10 @@ const FundsHistory = () => {
               <tr key={item.id}>
                 <td className="align-left">
                   {(() => {
-                    const date = new Date(item.created_at);
-                    return date.toLocaleString("en-IN", {
+                    // Supabase stores UTC but may omit the 'Z' — force UTC parsing
+                    const rawDate = item.created_at;
+                    const utcString = rawDate.endsWith("Z") ? rawDate : rawDate + "Z";
+                    return new Date(utcString).toLocaleString("en-IN", {
                       timeZone: "Asia/Kolkata",
                       day: "2-digit",
                       month: "2-digit",

@@ -45,7 +45,7 @@ const Menu = ({ onAddFunds }) => {
 
   return (
     <div className="menu-container">
-      <img src="/media/images/logo.svg" className="logo" alt="logo" />
+      <img src="/media/images/logo.svg" className="logo" alt="logo" />&nbsp;
 
       {/* Mobile Hamburger Icon */}
       <div 

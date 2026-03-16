@@ -373,33 +373,44 @@ table {
 .menu-container {
   flex: 1;
   height: 100%;
-  padding: 10px 20px;
+  padding: 10px 15px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .logo {
   width: 60px;
   height: auto;
   display: block;
+  margin-right: 24px;
 }
 
 .menus {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  flex: 1;
+  overflow: hidden;
 }
 
 .menus ul {
   list-style-type: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0;
+  margin: 0;
 }
 
 .menus li {
   display: inline-block;
-  margin-right: 30px;
+  margin-right: 18px;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .menu {
@@ -2036,8 +2047,15 @@ hr {
   }
 
   .indices-container {
-    display: none !important;
-    /* Hide Nifty/Sensex to save space */
+    display: flex !important;
+    flex-basis: 100%;
+    min-width: auto;
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgb(224, 224, 224);
+    justify-content: space-around;
+    padding: 6px 10px;
+    height: auto;
   }
 
   .menu-container {
