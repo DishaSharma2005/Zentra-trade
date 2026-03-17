@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import toast from "react-hot-toast";
 
@@ -7,11 +7,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // This ref is TRUE while we are still doing the first getSession() call.
-  // Any SIGNED_IN event that fires during that window is just a session
-  // restore (page refresh / revisit), NOT a real login — so we skip the toast.
-  const isInitialLoad = useRef(true);
 
   // INIT USER IN BACKEND
   const initUserInBackend = async (user) => {
@@ -30,39 +25,42 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    // listen to auth changes — registered BEFORE getSession so we never miss events
+    // ── Initial session ───────────────────────────────────────────────────────
+    // Silently restore the session on page load / refresh — no toast.
+    // We use sessionStorage to track whether the "login" toast has already been
+    // shown in this browser tab. sessionStorage survives F5 refreshes but is
+    // automatically cleared when the tab is closed, so the toast reappears on
+    // the next fresh login — exactly what we want.
+    supabase.auth.getSession().then(({ data }) => {
+      const currentUser = data.session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) initUserInBackend(currentUser);
+      setLoading(false);
+    });
+
+    // ── Auth state listener ───────────────────────────────────────────────────
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         const newUser = session?.user ?? null;
         setUser(newUser);
 
-        // Only show the login toast for REAL logins/signups, not session restores.
-        // isInitialLoad is true while we are still inside the startup getSession() call.
-        if (event === "SIGNED_IN" && newUser && !isInitialLoad.current) {
-          toast.success("Login successful! You can now see the dashboard.");
+        if (event === "SIGNED_IN" && newUser) {
+          // 'authSessionActive' is absent on the very first login of this tab.
+          // It stays set across page refreshes → no duplicate toasts.
+          const alreadyNotified = sessionStorage.getItem("authSessionActive");
+          if (!alreadyNotified) {
+            sessionStorage.setItem("authSessionActive", "true");
+            toast.success("Login successful! You can now see the dashboard.");
+          }
+          initUserInBackend(newUser);
         }
 
-        if (newUser) {
-          initUserInBackend(newUser);
+        if (event === "SIGNED_OUT") {
+          // Clear so the toast fires again on the next login.
+          sessionStorage.removeItem("authSessionActive");
         }
       }
     );
-
-    // Resolve the initial session — mark initialLoad false once done so
-    // any subsequent SIGNED_IN events trigger the toast normally.
-    supabase.auth.getSession().then(({ data }) => {
-      const currentUser = data.session?.user ?? null;
-      setUser(currentUser);
-
-      if (currentUser) {
-        initUserInBackend(currentUser);
-      }
-
-      setLoading(false);
-
-      //  Initial load complete — real logins from here onwards show the toast
-      isInitialLoad.current = false;
-    });
 
     return () => listener.subscription.unsubscribe();
   }, []);
