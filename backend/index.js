@@ -15,6 +15,19 @@ import indicesRoutes from "./routes/indices.js";
 dotenv.config();
 
 const app = express();
+// --- CORS ---
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://zentra-trade.vercel.app",
+      process.env.FRONTEND_URL
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  })
+);
+
 
 // --- Health Check (public, before rate limiter — for UptimeRobot / warmup pings) ---
 app.get("/health", (req, res) => {
@@ -30,20 +43,11 @@ const globalLimiter = rateLimit({
   message: { error: "Too many requests. Please slow down." },
 });
 
-app.use(globalLimiter);
+if (process.env.NODE_ENV === "production") {
+  app.use(globalLimiter);
+}
 
-// --- CORS ---
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://zentra-trade.vercel.app",
-      process.env.FRONTEND_URL
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true
-  })
-);
+
 
 app.use(
   "/api/payments/webhook",

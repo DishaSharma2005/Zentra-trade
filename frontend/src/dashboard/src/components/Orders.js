@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import toast from "react-hot-toast";
-import { authFetch } from "../../../utils/authFetch";
+import { apiFetch } from "../../../utils/apiFetch";
+
 
 const Orders = () => {
   const { user } = useAuth();
@@ -15,9 +16,10 @@ const Orders = () => {
     try {
       if (!silent) setLoading(true);
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await authFetch(
+      const res = await apiFetch(
         `${API_URL}/api/orders/${user.id}`
       );
+
 
       if (!res.ok) {
         throw new Error("Failed to fetch orders");
@@ -71,10 +73,11 @@ const Orders = () => {
     try {
       setCancelling(orderId);
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await authFetch(
+      const res = await apiFetch(
         `${API_URL}/api/orders/${orderId}`,
         { method: "DELETE" }
       );
+
 
       if (!res.ok) {
         throw new Error("Failed to cancel order");

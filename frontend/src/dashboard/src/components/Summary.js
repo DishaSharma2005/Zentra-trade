@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { authFetch } from "../../../utils/authFetch";
+import { apiFetch } from "../../../utils/apiFetch";
 
 const Summary = () => {
   const { user, loading } = useAuth();
@@ -17,15 +17,12 @@ const Summary = () => {
   const fetchSummary = async () => {
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await authFetch(
-        `${API_URL}/api/user/summary/${user.id}`
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch summary");
-
+      // apiFetch silently retries on 5xx/network errors (cold start) —
+      // no special UI needed since UptimeRobot keeps the server awake
+      const res = await apiFetch(`${API_URL}/api/user/summary/${user.id}`);
+      if (!res || !res.ok) throw new Error("Failed to fetch summary");
       const data = await res.json();
       setSummary(data);
-
     } catch (err) {
       console.error("Summary fetch failed:", err.message);
     }
@@ -40,16 +37,14 @@ const Summary = () => {
     currentValue,
     totalPnL,
     totalPnLPercent,
-    todayPnL
+    todayPnL,
   } = summary;
-  
 
   const pnlClass = totalPnL > 0 ? "profit" : totalPnL < 0 ? "loss" : "";
   const todayPnlClass = todayPnL > 0 ? "profit" : todayPnL < 0 ? "loss" : "";
 
   return (
     <div className="summary-container">
-
       <div className="greeting">
         <h4>Hi, {user?.email?.split("@")[0]} 👋</h4>
         {wallet && (
@@ -60,7 +55,6 @@ const Summary = () => {
       </div>
 
       <div className="card">
-
         <div className="main-value">
           <h2>₹ {currentValue?.toLocaleString()}</h2>
           <p>Current Portfolio Value</p>
@@ -75,7 +69,9 @@ const Summary = () => {
           <div>
             <span>Total P&L</span>
             <h4 className={pnlClass}>
-              {totalPnL > 0 ? "+" : ""}₹ {totalPnL?.toLocaleString()} ({totalPnL > 0 ? "+" : ""}{totalPnLPercent?.toFixed(2)}%)
+              {totalPnL > 0 ? "+" : ""}₹ {totalPnL?.toLocaleString()} (
+              {totalPnL > 0 ? "+" : ""}
+              {totalPnLPercent?.toFixed(2)}%)
             </h4>
           </div>
 
@@ -86,9 +82,7 @@ const Summary = () => {
             </h4>
           </div>
         </div>
-
       </div>
-
     </div>
   );
 };

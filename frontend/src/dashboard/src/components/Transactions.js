@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { authFetch } from "../../../utils/authFetch";
+import { apiFetch } from "../../../utils/apiFetch";
+
 
 const Transactions = () => {
   const { user } = useAuth();
@@ -13,9 +14,10 @@ const Transactions = () => {
     const fetchTransactions = async () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-        const res = await authFetch(
+        const res = await apiFetch(
           `${API_URL}/api/transactions/${user.id}`
         );
+
 
         if (!res.ok) {
           throw new Error("Failed to fetch transactions");

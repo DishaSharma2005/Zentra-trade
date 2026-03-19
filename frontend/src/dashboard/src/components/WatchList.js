@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import toast from "react-hot-toast";
-import { authFetch } from "../../../utils/authFetch";
+import { apiFetch } from "../../../utils/apiFetch";
 
 const WatchList = () => {
   const { user } = useAuth();
@@ -24,7 +24,7 @@ const WatchList = () => {
     const fetchPrices = async () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-        const res = await authFetch(`${API_URL}/api/watchlist/prices`, {
+        const res = await apiFetch(`${API_URL}/api/watchlist/prices`, {
           method: "POST",
           body: JSON.stringify({ symbols }),
         });
@@ -65,7 +65,7 @@ const WatchListItem = ({ stock }) => {
 
       try {
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-        const res = await authFetch(`${API_URL}/api/orders`, {
+        const res = await apiFetch(`${API_URL}/api/orders`, {
           method: "POST",
           body: JSON.stringify({
             userId: user.id,
