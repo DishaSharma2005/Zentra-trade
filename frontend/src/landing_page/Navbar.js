@@ -85,7 +85,7 @@ function Navbar({ onAddFunds }) {
                 </li>
                 <li className="nav-item">
                   <button
-                    className="btn btn-outline-danger px-3"
+                    className="btn btn-outline-danger px-2.5 py-1"
                     onClick={handleLogout}
                   >
                     Logout

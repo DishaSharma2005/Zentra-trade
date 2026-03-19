@@ -921,7 +921,10 @@ hr {
     border-right: none;
     border-bottom: 1px solid rgb(224, 224, 224);
     justify-content: space-between;
-    padding: 10px 5px;
+    padding: 6px 8px;
+    white-space: normal;
+    gap: 8px;  
+    
   }
 }
 
@@ -930,7 +933,7 @@ hr {
   align-items: center;
   justify-content: flex-start;
   z-index: -2;
-  gap: 8px;
+  gap: 1px;
 }
 
 .sensex {
@@ -943,6 +946,12 @@ hr {
 .nifty>*,
 .sensex>* {
   margin-right: 8px;
+}
+@media (max-width: 768px) {
+  .nifty>*,
+  .sensex>* {
+    margin-right: 2px;   /* reduce spacing */
+  }
 }
 
 .percent.up {

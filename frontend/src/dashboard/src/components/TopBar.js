@@ -42,7 +42,7 @@ const TopBar = ({ onAddFunds }) => {
   return (
     <div className="topbar-container">
       <div className="indices-container">
-        {renderIndex("NIFTY 50", indices.nifty)}
+        {renderIndex("NIFTY 50 ", indices.nifty)}
         {renderIndex("SENSEX", indices.sensex)}
       </div>
 

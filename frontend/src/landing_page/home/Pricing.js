@@ -13,7 +13,7 @@ function Pricing() {
             every trader and investor.
           </p>
           <a
-            href="#"
+            href="/pricing"
             className="text-decoration-none text-primary fw-medium"
           >
             See Pricing{" "}

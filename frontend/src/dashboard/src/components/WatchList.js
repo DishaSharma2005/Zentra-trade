@@ -125,7 +125,7 @@ const WatchListItem = ({ stock }) => {
     <div className="watchlist-container">
       <div className="header">
         <h3>Market Watchlist</h3>
-        <span>{watchlist.length} / 50</span>
+      <span> ● Live </span>
       </div>
 
       {loading ? (

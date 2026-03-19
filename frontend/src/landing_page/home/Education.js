@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom";  
 function Education() {
   return (
     <div className="container py-5">
@@ -28,13 +28,13 @@ function Education() {
               education resource in the world, covering everything from
               the basics to advanced trading.
             </p>
-            <a
-              href="#"
+            <Link 
+              to="/product"
               className="text-decoration-none text-primary fw-medium"
             >
               Learn on Varsity{" "}
               <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
-            </a>
+            </Link>
           </div>
 
           <div>
@@ -43,13 +43,13 @@ function Education() {
               investment community in India, where you can ask and answer
               market-related questions.
             </p>
-            <a
-              href="#"
+            <Link
+              to="/product"
               className="text-decoration-none text-primary fw-medium"
             >
               Visit TradingQ&A{" "}
               <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

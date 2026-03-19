@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 function Stats() {
     return ( 
@@ -23,8 +24,8 @@ function Stats() {
                 <img src="media/images/ecosystem.png" alt="Users Icon" className="img-fluid mb-4" />
                 <div className='d-flex flex-column flex-md-row justify-content-center justify-content-md-start gap-3'>
         
-                    <a href='' className='text-decoration-none'>Explore our Products <i className="fa fa-long-arrow-right"></i></a>
-                    <a href='' className='text-decoration-none'>Try our demo kit <i className="fa fa-long-arrow-right"></i></a>
+                    <Link  to='/product' className='text-decoration-none'>Explore our Products <i className="fa fa-long-arrow-right"></i></Link>
+                    <Link  to='/product' className='text-decoration-none'>Try our demo kit <i className="fa fa-long-arrow-right"></i></Link>
                 </div>
             </div>
         </div>
