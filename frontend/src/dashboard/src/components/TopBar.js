@@ -7,18 +7,19 @@ const TopBar = ({ onAddFunds }) => {
     sensex: { points: 0, change: 0 }
   });
 
-  const fetchIndices = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(`${API_URL}/api/indices`);
-      if (res.ok) {
-        const data = await res.json();
-        setIndices(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch indices:", err.message);
-    }
-  };
+const fetchIndices = async () => {
+  try {
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+    const res = await fetch(`${API_URL}/api/indices`);
+
+    if (!res.ok) return; // ❗ prevent retry loop
+
+    const data = await res.json();
+    setIndices(data);
+  } catch (err) {
+    console.error("Failed to fetch indices:", err.message);
+  }
+};
 
   useEffect(() => {
     fetchIndices();
