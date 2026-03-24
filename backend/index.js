@@ -45,9 +45,19 @@ const globalLimiter = rateLimit({
     return req.ip; // correct IP after trust proxy
   },
 });
-
 if (process.env.NODE_ENV === "production") {
-  app.use(globalLimiter);
+  app.use((req, res, next) => {
+    // ❌ skip limiter for fast APIs
+    if (
+      req.path.startsWith("/api/indices") 
+      
+    ) {
+      return next();
+    }
+
+    // ✅ apply limiter for rest
+    globalLimiter(req, res, next);
+  });
 }
 
 
