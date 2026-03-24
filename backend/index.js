@@ -21,13 +21,13 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://zentra-trade.vercel.app",
-      process.env.FRONTEND_URL
+      process.env.FRONTEND_URL||""
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
   })
 );
-
+app.set("trust proxy", 1);
 
 // --- Health Check (public, before rate limiter — for UptimeRobot / warmup pings) ---
 app.get("/health", (req, res) => {
@@ -37,10 +37,13 @@ app.get("/health", (req, res) => {
 // --- Rate Limiting ---
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // 200 requests per IP per 15 min
+  max: 1000, // 500 requests per IP per 15 min
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
+  keyGenerator: (req) => {
+    return req.ip; // correct IP after trust proxy
+  },
 });
 
 if (process.env.NODE_ENV === "production") {
@@ -69,6 +72,13 @@ app.use("/api/watchlist", watchlistRoutes);
 app.use("/api/chat", chatRoutes);
 
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
