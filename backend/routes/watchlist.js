@@ -1,9 +1,6 @@
 import express from "express";
 const router = express.Router();
-import YahooFinance from "yahoo-finance2";
-const yahooFinance = new YahooFinance({
-  suppressNotices: ["yahooSurvey"],
-});
+import { getQuotes } from "../services/yahooPriceService.js";
 
 router.post("/prices", async (req, res) => {
   try {
@@ -22,36 +19,25 @@ router.post("/prices", async (req, res) => {
       return `${lookup}.NS`;
     });
 
-    try {
-      // Fetch all quotes in a single batch request
-      const quotes = await yahooFinance.quote(symbolsToFetch);
-      
-      // Ensure quotes is an array (it might be a single object if only one symbol)
-      const quoteArray = Array.isArray(quotes) ? quotes : [quotes];
-      
-      // Map the results back to the original symbol names
-      results.push(...symbols.map(originalSymbol => {
-        const lookup = tickerMap[originalSymbol] || originalSymbol;
-        const ticker = `${lookup}.NS`;
-        const quote = quoteArray.find(q => q.symbol === ticker);
+    const quotes = await getQuotes(symbolsToFetch);
+    
+    // Map the results back to the original symbol names
+    results.push(...symbols.map(originalSymbol => {
+      const lookup = tickerMap[originalSymbol] || originalSymbol;
+      const ticker = `${lookup}.NS`;
+      const quote = quotes.find(q => q.symbol === ticker);
 
-        if (!quote) {
-          return { name: originalSymbol, price: null, percent: "-", isDown: false };
-        }
+      if (!quote || quote.regularMarketPrice == null) {
+        return { name: originalSymbol, price: null, percent: "-", isDown: false };
+      }
 
-        return {
-          name: originalSymbol,
-          price: quote.regularMarketPrice,
-          percent: quote.regularMarketChangePercent?.toFixed(2) + "%",
-          isDown: (quote.regularMarketChangePercent || 0) < 0,
-        };
-      }));
-
-    } catch (err) {
-      console.error("Batch fetch failed for watchlist:", err.message);
-      // Fallback: return empty results or nulls if entire batch fails
-      symbols.forEach(s => results.push({ name: s, price: null, percent: "-", isDown: false }));
-    }
+      return {
+        name: originalSymbol,
+        price: quote.regularMarketPrice,
+        percent: quote.regularMarketChangePercent?.toFixed(2) + "%",
+        isDown: (quote.regularMarketChangePercent || 0) < 0,
+      };
+    }));
 
     res.json(results);
 
@@ -59,6 +45,5 @@ router.post("/prices", async (req, res) => {
     res.status(500).json([]);
   }
 });
-
 
 export default router;

@@ -1,38 +1,22 @@
 import express from "express";
 const router = express.Router();
-import YahooFinance from "yahoo-finance2";
-
-const yahooFinance = new YahooFinance({
-  suppressNotices: ["yahooSurvey"],
-});
+import { getQuote } from "../services/yahooPriceService.js";
 
 router.get("/", async (req, res) => {
   try {
-    const [niftyData, sensexData] = await Promise.allSettled([
-      yahooFinance.quote("^NSEI"),
-      yahooFinance.quote("^BSESN"),
+    const [niftyData, sensexData] = await Promise.all([
+      getQuote("^NSEI"),
+      getQuote("^BSESN"),
     ]);
 
     const results = {
       nifty: {
-        points:
-          niftyData.status === "fulfilled"
-            ? niftyData.value?.regularMarketPrice || 0
-            : 0,
-        change:
-          niftyData.status === "fulfilled"
-            ? niftyData.value?.regularMarketChangePercent || 0
-            : 0,
+        points: niftyData ? niftyData.regularMarketPrice || 0 : 0,
+        change: niftyData ? niftyData.regularMarketChangePercent || 0 : 0,
       },
       sensex: {
-        points:
-          sensexData.status === "fulfilled"
-            ? sensexData.value?.regularMarketPrice || 0
-            : 0,
-        change:
-          sensexData.status === "fulfilled"
-            ? sensexData.value?.regularMarketChangePercent || 0
-            : 0,
+        points: sensexData ? sensexData.regularMarketPrice || 0 : 0,
+        change: sensexData ? sensexData.regularMarketChangePercent || 0 : 0,
       },
     };
 
