@@ -8,25 +8,35 @@ const Holdings = () => {
 
   useEffect(() => {
     if (!user) return;
+    
+    let timeoutId;
+    let isMounted = true;
 
-    const fetchHoldings = async () => {
+    const pollHoldings = async () => {
+      if (!isMounted) return;
       try {
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
         const res = await apiFetch(
           `${API_URL}/api/holdings/${user.id}`
         );
-        if (res.ok) {
+        if (res && res.ok) {
           const data = await res.json();
-          setHoldings(data);
+          if (isMounted) setHoldings(data);
         }
       } catch (e) {
         console.error("Failed to fetch holdings", e);
       }
+      
+      if (isMounted) {
+        timeoutId = setTimeout(pollHoldings, 15000); // Poll every 15 seconds
+      }
     };
 
-    fetchHoldings();
-    const intervalId = setInterval(fetchHoldings, 3000);
-    return () => clearInterval(intervalId);
+    pollHoldings();
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, [user]);
 
   const [currentPage, setCurrentPage] = useState(1);

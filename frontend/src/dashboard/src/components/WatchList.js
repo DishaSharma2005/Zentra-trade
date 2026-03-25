@@ -21,7 +21,11 @@ const WatchList = () => {
   ];
 
   useEffect(() => {
-    const fetchPrices = async () => {
+    let timeoutId;
+    let isMounted = true;
+
+    const pollPrices = async () => {
+      if (!isMounted) return;
       try {
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
         const res = await apiFetch(`${API_URL}/api/watchlist/prices`, {
@@ -29,29 +33,37 @@ const WatchList = () => {
           body: JSON.stringify({ symbols }),
         });
 
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setWatchlist(data);
-        } else if (Array.isArray(data.data)) {
-          setWatchlist(data.data);
-        } else {
-          console.error("Invalid watchlist response:", data);
-          setWatchlist([]);
+        if (res && res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            if (Array.isArray(data)) {
+              setWatchlist(data);
+            } else if (data && Array.isArray(data.data)) {
+              setWatchlist(data.data);
+            } else {
+              console.error("Invalid watchlist response:", data);
+              setWatchlist([]);
+            }
+          }
         }
-
       } catch (err) {
         console.error("Failed to load watchlist", err);
-        setWatchlist([]);
+        if (isMounted) setWatchlist([]);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
+      }
+      
+      if (isMounted) {
+        timeoutId = setTimeout(pollPrices, 15000); // Poll every 15 seconds
       }
     };
 
-    fetchPrices();
+    pollPrices();
 
-    const interval = setInterval(fetchPrices, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
 const WatchListItem = ({ stock }) => {

@@ -7,26 +7,37 @@ const Summary = () => {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    if (!loading && user) {
-      fetchSummary();
-      const intervalId = setInterval(fetchSummary, 1500);
-      return () => clearInterval(intervalId);
-    }
-  }, [loading, user]);
+    let timeoutId;
+    let isMounted = true;
 
-  const fetchSummary = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      // apiFetch silently retries on 5xx/network errors (cold start) —
-      // no special UI needed since UptimeRobot keeps the server awake
-      const res = await apiFetch(`${API_URL}/api/user/summary/${user.id}`);
-      if (!res || !res.ok) throw new Error("Failed to fetch summary");
-      const data = await res.json();
-      setSummary(data);
-    } catch (err) {
-      console.error("Summary fetch failed:", err.message);
+    const pollSummary = async () => {
+      if (!isMounted || loading || !user) return;
+      
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await apiFetch(`${API_URL}/api/user/summary/${user.id}`);
+        if (res && res.ok) {
+          const data = await res.json();
+          if (isMounted) setSummary(data);
+        }
+      } catch (err) {
+        console.error("Summary fetch failed:", err.message);
+      }
+
+      if (isMounted) {
+        timeoutId = setTimeout(pollSummary, 15000); // Poll every 15 seconds
+      }
+    };
+
+    if (!loading && user) {
+      pollSummary();
     }
-  };
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [loading, user]);
 
   if (loading) return <p className="loading">Loading...</p>;
   if (!summary) return <p className="loading">Loading portfolio...</p>;

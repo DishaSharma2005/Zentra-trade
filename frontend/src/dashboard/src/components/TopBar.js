@@ -7,24 +7,35 @@ const TopBar = ({ onAddFunds }) => {
     sensex: { points: 0, change: 0 }
   });
 
-const fetchIndices = async () => {
-  try {
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-    const res = await fetch(`${API_URL}/api/indices`);
-
-    if (!res.ok) return; // ❗ prevent retry loop
-
-    const data = await res.json();
-    setIndices(data);
-  } catch (err) {
-    console.error("Failed to fetch indices:", err.message);
-  }
-};
-
   useEffect(() => {
-    fetchIndices();
-    const intervalId = setInterval(fetchIndices, 10000); // Update every 10 seconds
-    return () => clearInterval(intervalId);
+    let timeoutId;
+    let isMounted = true;
+
+    const pollIndices = async () => {
+      if (!isMounted) return;
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_URL}/api/indices`);
+
+        if (res && res.ok) {
+          const data = await res.json();
+          if (isMounted) setIndices(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch indices:", err.message);
+      }
+
+      if (isMounted) {
+        timeoutId = setTimeout(pollIndices, 15000); // 15 seconds
+      }
+    };
+
+    pollIndices();
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const renderIndex = (name, data) => {
