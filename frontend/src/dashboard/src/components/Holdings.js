@@ -28,7 +28,7 @@ const Holdings = () => {
       }
       
       if (isMounted) {
-        timeoutId = setTimeout(pollHoldings, 15000); // Poll every 15 seconds
+        timeoutId = setTimeout(pollHoldings, 3000); // Poll every 3 seconds for fast UI updates after BUY
       }
     };
 

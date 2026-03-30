@@ -8,12 +8,55 @@ router.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const { data: holdings, error } = await supabase
+    let { data: holdings, error } = await supabase
       .from("holdings")
       .select("*")
       .eq("user_id", userId);
 
     if (error) throw error;
+
+    // --- AUTO CONSOLIDATE DUPLICATE HOLDINGS ---
+    // Since previous bugs spawned multiple rows for the same symbol, we merge them here.
+    const consolidatedMap = {};
+    const toDelete = [];
+
+    for (const h of holdings) {
+      if (!consolidatedMap[h.symbol]) {
+        consolidatedMap[h.symbol] = h;
+      } else {
+        const primary = consolidatedMap[h.symbol];
+        const oldQty = Number(primary.quantity);
+        const oldAvg = Number(primary.avg_price);
+        const addQty = Number(h.quantity);
+        const addAvg = Number(h.avg_price);
+
+        const newQty = oldQty + addQty;
+        // avoid division by zero
+        const newAvg = newQty > 0 ? ((oldQty * oldAvg + addQty * addAvg) / newQty) : 0;
+
+        primary.quantity = newQty;
+        primary.avg_price = newAvg;
+        
+        toDelete.push(h.id);
+      }
+    }
+
+    if (toDelete.length > 0) {
+       console.log(`🧹 Auto-consolidating ${toDelete.length} duplicate holdings for user ${userId}`);
+       // Update primary rows
+       for (const symbol in consolidatedMap) {
+         await supabase.from("holdings").update({
+           quantity: consolidatedMap[symbol].quantity,
+           avg_price: consolidatedMap[symbol].avg_price
+         }).eq("id", consolidatedMap[symbol].id);
+       }
+       // Delete merged duplicates
+       for (const id of toDelete) {
+         await supabase.from("holdings").delete().eq("id", id);
+       }
+       // Refresh list
+       holdings = Object.values(consolidatedMap);
+    }
 
     const enrichedHoldings = await Promise.all(
       holdings.map(async (h) => {

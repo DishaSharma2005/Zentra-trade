@@ -29,15 +29,19 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Wallet not found" });
     }
 
-    // 2️⃣ Fetch holding
-    const { data: holding } = await supabase
+    // 2️⃣ Fetch ALL matching holdings (to avoid .single() error when duplicate rows exist due to race conditions)
+    const { data: matchingHoldings } = await supabase
       .from("holdings")
       .select("*")
       .eq("user_id", userId)
-      .eq("symbol", symbol)
-      .single();
+      .eq("symbol", symbol);
 
-    // � Validation & Lock phase
+    const holdingExists = matchingHoldings && matchingHoldings.length > 0;
+    const totalHoldingQty = holdingExists 
+      ? matchingHoldings.reduce((sum, h) => sum + Number(h.quantity), 0) 
+      : 0;
+
+    //  Validation & Lock phase
     if (type === "BUY") {
       if (wallet.balance < orderValue) {
         return res.status(400).json({ error: "Insufficient balance" });
@@ -63,18 +67,25 @@ router.post("/", async (req, res) => {
       ]);
       if (txErr) console.error("Tx Insert Error:", txErr);
     } else if (type === "SELL") {
-      const holdingQty = Number(holding?.quantity || 0);
-
-      if (!holding || holdingQty < numQty) {
+      if (!holdingExists || totalHoldingQty < numQty) {
         return res.status(400).json({ error: "Not enough holdings to sell" });
       }
 
-      // lock holdings
-      const newQty = holdingQty - numQty;
-      if (newQty === 0) {
-        await supabase.from("holdings").delete().eq("id", holding.id);
-      } else {
-        await supabase.from("holdings").update({ quantity: newQty }).eq("id", holding.id);
+      // lock holdings across multiple duplicate rows (if they exist) sequentially
+      let remainingToLock = numQty;
+      for (const h of matchingHoldings) {
+        if (remainingToLock <= 0) break;
+        
+        const hQty = Number(h.quantity);
+        if (hQty <= remainingToLock) {
+          // Consume this whole row
+          await supabase.from("holdings").delete().eq("id", h.id);
+          remainingToLock -= hQty;
+        } else {
+          // Consume partial row
+          await supabase.from("holdings").update({ quantity: hQty - remainingToLock }).eq("id", h.id);
+          remainingToLock = 0;
+        }
       }
     } else {
       return res.status(400).json({ error: "Invalid order type" });
@@ -98,9 +109,9 @@ router.post("/", async (req, res) => {
 
     res.json({ success: true, order });
 
-    // 🟢 SIMULATE DELAY: Complete the trade after 8 seconds
+    // SIMULATE DELAY: Complete the trade after 8 seconds
     setTimeout(async () => {
-      // 🚨 CRITICAL PROTECTION: Re-fetch the order to ensure it's still PENDING.
+      //  CRITICAL PROTECTION: Re-fetch the order to ensure it's still PENDING.
       // If it was cancelled by the user during this 8s window, ABORT.
       const { data: currentOrder } = await supabase
         .from("orders")
@@ -115,16 +126,24 @@ router.post("/", async (req, res) => {
 
       if (type === "BUY") {
         // Complete BUY: give user their new holdings
-        if (holding) {
-          const oldQty = Number(holding.quantity);
-          const oldAvg = Number(holding.avg_price);
+        // CRITICAL: Re-fetch holdings right before completion to avoid 8-second race condition!
+        const { data: latestHoldings } = await supabase
+          .from("holdings")
+          .select("*")
+          .eq("user_id", userId)
+          .eq("symbol", symbol);
+
+        if (latestHoldings && latestHoldings.length > 0) {
+          const primaryHolding = latestHoldings[0];
+          const oldQty = Number(primaryHolding.quantity);
+          const oldAvg = Number(primaryHolding.avg_price);
           const newQty = oldQty + numQty;
           const newAvg = (oldQty * oldAvg + numQty * numPrice) / newQty;
 
           await supabase
             .from("holdings")
             .update({ quantity: newQty, avg_price: newAvg })
-            .eq("id", holding.id);
+            .eq("id", primaryHolding.id);
         } else {
           await supabase.from("holdings").insert([
             {
@@ -137,7 +156,8 @@ router.post("/", async (req, res) => {
         }
       } else if (type === "SELL") {
         // Complete SELL: give user their cash
-        const holdingAvg = Number(holding.avg_price);
+        // Use average price of the first holding row for PnL calculation
+        const holdingAvg = holdingExists ? Number(matchingHoldings[0].avg_price) : numPrice;
         const realizedPnL = (numPrice - holdingAvg) * numQty;
         
         // refresh wallet to avoid race conditions
@@ -256,13 +276,21 @@ router.delete("/:orderId", async (req, res) => {
         .select("*")
         .eq("user_id", order.user_id)
         .eq("symbol", order.symbol)
-        .single();
+        .limit(1)
+        .single(); // Actually, limit(1) isn't enough to prevent 0 row crash, but wait, .single() might crash on 0. It's safer to not use single.
+      
+      const { data: matchingHoldings } = await supabase
+        .from("holdings")
+        .select("*")
+        .eq("user_id", order.user_id)
+        .eq("symbol", order.symbol);
 
-      if (holding) {
+      if (matchingHoldings && matchingHoldings.length > 0) {
+        const primaryHolding = matchingHoldings[0];
         await supabase
           .from("holdings")
-          .update({ quantity: Number(holding.quantity) + orderQty })
-          .eq("id", holding.id);
+          .update({ quantity: Number(primaryHolding.quantity) + orderQty })
+          .eq("id", primaryHolding.id);
       } else {
         // if holding was deleted because quantity went to 0, recreate it
         await supabase.from("holdings").insert([

@@ -25,7 +25,7 @@ const Summary = () => {
       }
 
       if (isMounted) {
-        timeoutId = setTimeout(pollSummary, 15000); // Poll every 15 seconds
+        timeoutId = setTimeout(pollSummary, 3000); // Poll every 3 seconds
       }
     };
 
