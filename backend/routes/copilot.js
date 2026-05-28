@@ -125,10 +125,16 @@ JSON SCHEMA:
 
   } catch (err) {
     console.error("Copilot Agent Error:", err.message);
+    
+    let userMessage = "⚠️ **Error:** Something went wrong inside the Copilot Workspace agent.";
+    if (err.message.includes("429") || err.message.toLowerCase().includes("quota")) {
+      userMessage = `⚠️ **AI Daily Limit Reached**\n\nThe platform's shared AI Copilot has reached its free-tier request limit.\n\n*   **Why this happens:** This project runs on Google's free-tier Gemini API, which restricts daily requests.\n*   **When it resets:** Quotas reset automatically at **00:00 UTC (5:30 AM IST)** daily.\n*   **Manual Trading Active**: You can still top up your wallet, place orders, and manage your holdings manually in the dashboard while the limit renews.`;
+    }
+
     return res.status(500).json({
       error: err.message,
       reasoningLogs: ["[error] Internal execution crash", `[error] ${err.message}`],
-      textResponse: "⚠️ **Error:** Something went wrong inside the Copilot Workspace agent.",
+      textResponse: userMessage,
       draftedTrade: null
     });
   }
