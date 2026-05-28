@@ -27,6 +27,8 @@ export const apiFetch = async (url, options = {}, retries = 3, delay = 2000) => 
       if (attempt < retries - 1) {
         console.warn(`[apiFetch] Server error ${res.status} on "${url}" — retrying in ${delay}ms (attempt ${attempt + 1}/${retries})`);
         await new Promise((r) => setTimeout(r, delay));
+      } else {
+        return res; // Return the 5xx response on the final attempt instead of undefined
       }
     } catch (err) {
       // Network error (server totally down / cold start network timeout)

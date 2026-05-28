@@ -1,10 +1,6 @@
 import express from "express";
 import supabase from "../supabaseAdmin.js";
-import YahooFinance from "yahoo-finance2";
-
-const yahooFinance = new YahooFinance({
-  suppressNotices: ["yahooSurvey"],
-});
+import { getQuote } from "../services/yahooPriceService.js";
 
 const router = express.Router();
 
@@ -117,7 +113,7 @@ router.get("/summary/:userId", async (req, res) => {
 
     if (holdings.length > 0) {
       const quotePromises = holdings.map(stock =>
-        yahooFinance.quote(`${stock.symbol}.NS`).catch((err) => {
+        getQuote(`${stock.symbol}.NS`).catch((err) => {
           console.error(`Failed to fetch quote for ${stock.symbol}:`, err.message);
           return null; // Return null to handle gracefully below
         })

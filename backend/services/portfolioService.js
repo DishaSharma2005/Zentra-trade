@@ -1,9 +1,5 @@
 import supabase from "../supabaseAdmin.js";
-import YahooFinance from "yahoo-finance2";
-
-const yahooFinance = new YahooFinance({
-  suppressNotices: ["yahooSurvey"],
-});
+import { getQuotes } from "./yahooPriceService.js";
 
 export const calculatePortfolioSummary = async (userId) => {
   // ===============================
@@ -65,8 +61,7 @@ export const calculatePortfolioSummary = async (userId) => {
   let quotes = [];
 
   try {
-    const rawQuotes = await yahooFinance.quote(symbolsToFetch);
-    quotes = Array.isArray(rawQuotes) ? rawQuotes : [rawQuotes];
+    quotes = await getQuotes(symbolsToFetch);
   } catch (err) {
     console.error("Batch fetch failed for portfolio summary:", err.message);
     // If entire batch fails, quotes remains empty array, calculations will handle it

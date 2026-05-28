@@ -42,7 +42,6 @@ router.get("/:userId", async (req, res) => {
     }
 
     if (toDelete.length > 0) {
-       console.log(`🧹 Auto-consolidating ${toDelete.length} duplicate holdings for user ${userId}`);
        // Update primary rows
        for (const symbol in consolidatedMap) {
          await supabase.from("holdings").update({

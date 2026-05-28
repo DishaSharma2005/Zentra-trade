@@ -11,6 +11,7 @@ import watchlistRoutes from "./routes/watchlist.js";
 import paymentsRoutes from "./routes/payments.js";
 import chatRoutes from "./routes/chat.js";
 import indicesRoutes from "./routes/indices.js";
+import copilotRoutes from "./routes/copilot.js";
 
 dotenv.config();
 
@@ -80,6 +81,7 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/transactions", transactionsRoutes);
 app.use("/api/watchlist", watchlistRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/copilot", copilotRoutes);
 
 
 app.use((err, req, res, next) => {

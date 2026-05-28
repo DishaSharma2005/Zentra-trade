@@ -1,0 +1,534 @@
+/* Minimalist light theme matching the Zerodha platform style */
+.copilot-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 100%;
+  background-color: #ffffff;
+  border-left: 1px solid #e0e0e0;
+  color: #333333;
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile responsive layout overrides */
+.copilot-sidebar-container.mobile-drawer {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  height: 100vh !important;
+  width: 320px !important;
+  z-index: 1050 !important;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15) !important;
+  animation: slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  border-left: 1px solid #d4d4d8;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Translucent dark background overlay for mobile screens */
+.copilot-mobile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1040;
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Collapsed overlay trigger button */
+.copilot-collapsed-trigger {
+  position: fixed;
+  right: 0;
+  top: 100px;
+  background-color: #ffffff;
+  border: 1px solid #d4d4d8;
+  border-right: none;
+  padding: 10px 14px;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #387ed1; /* Zerodha blue */
+  box-shadow: -2px 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.copilot-collapsed-trigger:hover {
+  transform: translateX(-4px);
+  background-color: #f8f9fa;
+}
+
+.copilot-collapsed-trigger .text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #333333;
+}
+
+/* Floating overlay button strictly on mobile */
+.copilot-collapsed-trigger.mobile-floating {
+  top: auto !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  border-radius: 50% !important;
+  border: 1px solid #d4d4d8 !important;
+  width: 56px !important;
+  height: 56px !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  background-color: #387ed1 !important;
+  color: #ffffff !important;
+}
+
+.copilot-collapsed-trigger.mobile-floating:hover {
+  transform: scale(1.05) !important;
+  background-color: #245796 !important;
+}
+
+/* Header style */
+.copilot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 12px;
+}
+
+.copilot-header .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #222222;
+}
+
+.copilot-header .collapse-btn {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.copilot-header .collapse-btn:hover {
+  color: #df5151;
+}
+
+/* Mode Switcher */
+.mode-toggle-bar {
+  display: flex;
+  background-color: #f4f4f5;
+  padding: 3px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.mode-toggle-bar button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #71717a;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.mode-toggle-bar button.active {
+  background-color: #ffffff;
+  color: #222222;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Quick Action Buttons */
+.quick-actions-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quick-actions-panel button {
+  background-color: #ffffff;
+  color: #444444;
+  border: 1px solid #d4d4d8;
+  padding: 8px 4px;
+  font-size: 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.quick-actions-panel button:hover {
+  background-color: #f4f4f5;
+  border-color: #a1a1aa;
+}
+
+/* Pulsing blue button for drafting trades */
+.quick-actions-panel button.btn-glowing {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #387ed1, #245796);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  animation: pulse-glow-light 2s infinite;
+  font-size: 12px;
+  padding: 10px;
+}
+
+@keyframes pulse-glow-light {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 126, 209, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(56, 126, 209, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 126, 209, 0);
+  }
+}
+
+.quick-actions-panel button.btn-glowing:hover {
+  background: linear-gradient(135deg, #4184f3, #2f69b8);
+}
+
+/* Light Terminal Console container */
+.terminal-console-container {
+  background-color: #f8f9fa;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.terminal-console-container .terminal-header {
+  background-color: #eaeaea;
+  color: #55555d;
+  font-size: 9px;
+  font-family: monospace;
+  padding: 4px 8px;
+  border-bottom: 1px solid #d4d4d8;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+.terminal-console-container .terminal-body {
+  padding: 8px;
+  height: 120px;
+  overflow-y: auto;
+  font-family: "Monaco", "Courier New", monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  border-radius: 0 0 6px 6px;
+}
+
+/* Terminal logs coloring inside light mode */
+.log-line {
+  margin-bottom: 4px;
+}
+
+.log-system {
+  color: #71717a;
+}
+
+.log-info {
+  color: #18181b;
+}
+
+.log-success {
+  color: #155724; /* Green */
+  font-weight: 500;
+}
+
+.log-error {
+  color: #721c24; /* Red */
+  font-weight: 500;
+}
+
+.log-proposal {
+  color: #0284c7; /* Sky blue */
+  font-weight: bold;
+}
+
+.log-loading {
+  color: #b45309; /* Amber loading */
+  animation: pulse-loading 1s infinite alternate;
+}
+
+@keyframes pulse-loading {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+/* Custom scrollbars */
+.terminal-body::-webkit-scrollbar,
+.copilot-sidebar-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb,
+.copilot-sidebar-container::-webkit-scrollbar-thumb {
+  background-color: #d4d4d8;
+  border-radius: 2px;
+}
+
+/* Markdown AI Output styling */
+.ai-response-container {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3f3f46;
+  background-color: #fcfcfc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  margin-bottom: 16px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.ai-response-container p {
+  margin: 0 0 8px 0;
+}
+
+.ai-response-container p:last-child {
+  margin-bottom: 0;
+}
+
+.ai-response-container ul {
+  padding-left: 16px;
+  margin: 4px 0;
+}
+
+.ai-response-container li {
+  margin-bottom: 4px;
+}
+
+/* Trade proposal card matching Zerodha colors */
+.trade-proposal-card {
+  background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+  border: 2px solid #387ed1;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(56, 126, 209, 0.12);
+  animation: light-card-glow-pulse 3s infinite;
+}
+
+@keyframes light-card-glow-pulse {
+  0% {
+    box-shadow: 0 4px 16px rgba(56, 126, 209, 0.1);
+    border-color: #387ed1;
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(56, 126, 209, 0.25);
+    border-color: #4caf50;
+  }
+  100% {
+    box-shadow: 0 4px 16px rgba(56, 126, 209, 0.1);
+    border-color: #387ed1;
+  }
+}
+
+.trade-proposal-card .proposal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.trade-proposal-card .proposal-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.trade-proposal-card .proposal-badge.buy {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.trade-proposal-card .proposal-badge.sell {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.trade-proposal-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.trade-proposal-card .proposal-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.trade-proposal-card .proposal-row div {
+  flex: 1;
+}
+
+.trade-proposal-card .label {
+  display: block;
+  font-size: 9px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.trade-proposal-card .value {
+  font-size: 14px;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+.trade-proposal-card .proposal-reason {
+  font-size: 11px;
+  color: #334155;
+  font-style: italic;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  border-left: 2px solid #387ed1;
+  padding-left: 8px;
+}
+
+.trade-proposal-card .btn-approve-execute {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trade-proposal-card .btn-approve-execute.buy {
+  background-color: #4caf50; /* Zerodha green */
+  color: #ffffff;
+}
+
+.trade-proposal-card .btn-approve-execute.buy:hover {
+  background-color: #388e3c;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
+
+.trade-proposal-card .btn-approve-execute.sell {
+  background-color: #df5151; /* Zerodha red */
+  color: #ffffff;
+}
+
+.trade-proposal-card .btn-approve-execute.sell:hover {
+  background-color: #b93939;
+  box-shadow: 0 0 8px rgba(223, 81, 81, 0.4);
+}
+
+.trade-proposal-card .btn-approve-execute:disabled {
+  background-color: #94a3b8;
+  color: #e2e8f0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Chat Input Bar styling */
+.copilot-input-area {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 12px;
+}
+
+.copilot-input-area input {
+  flex: 1;
+  background-color: #ffffff;
+  border: 1px solid #d4d4d8;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #222222;
+  font-size: 12px;
+}
+
+.copilot-input-area input:focus {
+  border-color: #387ed1;
+  outline: none;
+}
+
+.copilot-input-area button {
+  background-color: #387ed1;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.copilot-input-area button:hover {
+  background-color: #245796;
+}
+
+.copilot-input-area button:disabled {
+  background-color: #f4f4f5;
+  color: #a1a1aa;
+  cursor: not-allowed;
+}
+
+/* CSS Grid layout overrides for three-column workspace on desktop */
+@media screen and (min-width: 768px) {
+  .dashboard-container {
+    display: flex !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .dashboard-container .watchlist-container {
+    flex-basis: 22% !important;
+    max-width: 22% !important;
+    width: 22% !important;
+  }
+
+  .dashboard-container .content {
+    flex-basis: 50% !important;
+    max-width: 50% !important;
+    width: 50% !important;
+    border-right: 1px solid #eaeaea;
+  }
+}

@@ -11,8 +11,11 @@ import WatchList from "./WatchList";
 import FundsHistory from "./FundsHistory";
 import PaymentSuccess from "./payments/PaymentSuccess";
 import PaymentCancel from "./payments/PaymentCancel";
+import CopilotSidebar from "./CopilotSidebar";
+import { useAuth } from "../../../context/AuthContext";
 
 const Dashboard = ({ onAddFunds }) => {
+  const { user } = useAuth();
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -45,6 +48,8 @@ const Dashboard = ({ onAddFunds }) => {
          
         </Routes>
       </div>
+
+      <CopilotSidebar userId={user?.id} isMobile={isMobile} />
     </div>
     </>
   );
